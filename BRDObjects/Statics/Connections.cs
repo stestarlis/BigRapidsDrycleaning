@@ -10,7 +10,7 @@ namespace BRDObjects.Statics
         public static string GetConnection()
         {
             var useEllisConnection = PingHost("MEDIASERVER");
-            return useEllisConnection ? GetEllisConnection() : GetAzureConnection();
+            return GetAzureConnection();
         }
 
         public static bool PingHost(string nameOrAddress)
