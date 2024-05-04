@@ -1,0 +1,229 @@
+﻿@using BRDObjects
+@using BRDrycleaningDataAccess
+@{
+    ViewData["Title"] = "Our Community";
+    var coupons = TempData["Promos"] as List<Promotional>;
+    var activeCoupons = coupons.Where(x => x.IsActive == true).ToList();
+
+    var storeInfo = DataHooks.Instance.GetAllStoreInfo();
+    var callToActionParagraph = storeInfo.FirstOrDefault(x => x.InformationKey == "CallToAction1");
+    var callToActionQuote = storeInfo.FirstOrDefault(x => x.InformationKey == "CallToAction1Quote");
+    var callToActionParagraph2 = storeInfo.FirstOrDefault(x => x.InformationKey == "CallToAction1SubParagraph");
+
+    var aboutUs1 = storeInfo.FirstOrDefault(x => x.InformationKey == "AboutUs");
+    var aboutUs2 = storeInfo.FirstOrDefault(x => x.InformationKey == "AboutUsSecondParagraph");
+    var testimonials = DataHooks.Instance.GetAllTestimonials().Where(x => x.DisplayToPublic == true).OrderByDescending(x => x.Id).Take(6);
+}
+<header>
+    <link href="~/css/Community.css" rel="stylesheet" />
+</header>
+
+<div class="text-center">
+    <h1 class="text-body-emphasis">Our Commitment to the Community</h1>
+    <p>
+        @aboutUs1?.InformationValue
+        <br />
+        @aboutUs2?.InformationValue
+    </p>
+    <div class="mb-5">
+        <a href="#greenCommitment" class="btn btn-success btn-lg px-4">Our Commitment to Green</a>
+    </div>
+</div>
+<hr />
+
+<!-- Promotionals -->
+<div>
+    <h1 class="text-body-emphasis text-center">Promotions and Deals</h1>
+    <div id="promotionals">
+        @foreach (var sale in activeCoupons)
+        {
+            <div class="coupon">
+                <div class="iconContainer">
+                    <i class='bx bxs-washer'></i>
+                </div>
+
+                <div class="couponContainer" style="background-color:white">
+                    <h2>
+                        <b>
+                            @switch (sale.DiscountType.Title)
+                            {
+                                case "Percentage":
+                                    <span>@sale.Price% OFF</span>
+                                    break;
+                                case "Dollar Amount":
+                                    <span>$@sale.Price OFF</span>
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        </b>
+                    </h2>
+                </div>
+
+                <div class="couponContainer">
+                    <p>Mention this coupon or use Promo Code:</p>
+                    <span class="promo">@sale.Title</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<hr />
+
+@{
+    var firstTestimonial = @testimonials?.FirstOrDefault();
+    var secondTestimonial = @testimonials?.Skip(1)?.FirstOrDefault();
+    var thirdTestimonial = @testimonials?.Skip(2)?.FirstOrDefault();
+    var fourthTestimonial = @testimonials?.Skip(3)?.FirstOrDefault();
+    var fifthTestimonial = @testimonials?.Skip(4)?.FirstOrDefault();
+    var sixthTestimonial = @testimonials?.Skip(5)?.FirstOrDefault();
+}
+<!-- Testimonials -->
+<div id="testimonials" hidden="@(firstTestimonial == null)">
+    <h1>Customer Testimonials</h1>
+    <div class="outerdiv">
+        <div class="innerdiv">
+            <!-- div1 -->
+            <div class="div1 eachdiv">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-daniel.jpg" alt="">
+                    </div>
+                    <div class="detbox">
+                        @if (firstTestimonial?.Customer == null)
+                        {
+                            <p class="name">Anonymous User</p>
+                        }
+                        else
+                        {
+                            <p class="name">@firstTestimonial?.Customer?.FirstName @firstTestimonial?.Customer?.LastName</p>
+                        }
+                        <p class="designation">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review">
+                    <p>
+                        @firstTestimonial?.Subject
+                        <hr />
+                        @firstTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+            <!-- div2 -->
+            <div class="div2 eachdiv" hidden="@(secondTestimonial == null)">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-jonathan.jpg" alt="">
+                    </div>
+                    <div class="detbox">
+                        <p class="name">@secondTestimonial?.Customer?.FirstName @secondTestimonial?.Customer?.LastName</p>
+                        <p class="designation">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review">
+                    <p>
+                        @secondTestimonial?.Subject
+                        <hr />
+                        @secondTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+            <!-- div3 a -->
+            <div class="div3a eachdiv" hidden="@(thirdTestimonial == null)">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-kira.jpg" alt="">
+                    </div>
+                    <div class="detbox dark">
+                        <p class="name dark">@thirdTestimonial?.Customer?.FirstName @thirdTestimonial?.Customer?.LastName</p>
+                        <p class="designation dark">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review dark">
+                    <p>
+                        @thirdTestimonial?.Subject
+                        <hr />
+                        @thirdTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+            <!-- div3 b -->
+            <div class="div3b eachdiv" hidden="@(fourthTestimonial == null)">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-kira.jpg" alt="">
+                    </div>
+                    <div class="detbox">
+                        <p class="name">@fourthTestimonial?.Customer?.FirstName @fourthTestimonial?.Customer?.LastName</p>
+                        <p class="designation">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review">
+                    <p>
+                        @fourthTestimonial?.Subject
+                        <hr />
+                        @fourthTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+            <!-- div4 -->
+            <div class="div4 eachdiv" hidden="@(fifthTestimonial == null)">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-jeanette.jpg" alt="">
+                    </div>
+                    <div class="detbox">
+                        <p class="name">@fifthTestimonial?.Customer?.FirstName @fifthTestimonial?.Customer?.LastName</p>
+                        <p class="designation">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review">
+                    <p>
+                        @fifthTestimonial?.Subject
+                        <hr />
+                        @fifthTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+            <!-- div5 -->
+            <div class="div5 eachdiv" hidden="@(sixthTestimonial == null)">
+                <div class="userdetails">
+                    <div class="imgbox">
+                        <img src="https://raw.githubusercontent.com/RahulSahOfficial/testimonials_grid_section/5532c958b7d3c9b910a216b198fdd21c73112d84/images/image-patrick.jpg" alt="">
+                    </div>
+                    <div class="detbox">
+                        <p class="name">@sixthTestimonial?.Customer?.FirstName @sixthTestimonial?.Customer?.LastName</p>
+                        <p class="designation">Verified Visitor</p>
+                    </div>
+                </div>
+                <div class="review">
+                    <p>
+                        @sixthTestimonial?.Subject
+                        <hr />
+                        @sixthTestimonial?.Body
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<!-- Green Commitment -->
+<div id="greenCommitment">
+    <div class="textContainer text-center">
+        <h1 class="text-body-emphasis">Our Commitment to Green</h1>
+        <p>
+            @callToActionParagraph?.InformationValue
+            <br />
+            <br />
+            <em>@callToActionQuote?.InformationValue</em>
+            <br />
+            <br />
+            @callToActionParagraph2?.InformationValue
+        </p>
+    </div>
+</div>

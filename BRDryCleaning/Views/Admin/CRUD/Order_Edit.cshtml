@@ -1,0 +1,400 @@
+﻿@using BRDObjects
+@using System.Globalization
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var myOrder = TempData["myOrder"] as Order;
+    var orderItems = myOrder!.OrderItems;
+    var orderDiscounts = myOrder.OrderDiscounts;
+    var orderPayments = myOrder.MonetaryTransactions;
+
+    var sIT = TempData["ServiceItemTypes"] as List<ServiceItemType>;
+    var allStatuses = TempData["Statuses"] as List<RecordStatus>;
+    var allAccounts = TempData["Accounts"] as List<Account>;
+    var allDiscounts = TempData["Discounts"] as List<Discount>;
+    var paymentTypes = TempData["PaymentTypes"] as List<PaymentType> ?? new();
+
+    List<int?> itemIDs = new();
+    List<int?> discountIDs = new();
+    List<int?> paymentIDs = new();
+
+    foreach (var item in orderItems)
+    {
+        itemIDs.Add(item.ServiceItemTypeId);
+    }
+    foreach (var item in orderDiscounts!)
+    {
+        discountIDs.Add(item.DiscountId);
+    }
+    foreach (var item in orderPayments!)
+    {
+        paymentIDs.Add(item.PaymentTypeId);
+    }
+}
+
+<style>
+    .top-margin {
+        margin-top: 15px;
+    }
+
+    .payment-field-container {
+        display: grid;
+        grid-template-columns: 1fr 4fr;
+        grid-template-rows: 1fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+        padding-bottom: 15px;
+    }
+
+    .add-payment-button-container {
+        grid-area: 1 / 1 / 2 / 3;
+        align-self: center;
+    }
+
+    .payment-balances-container {
+        grid-area: 1 / 2 / 2 / 3;
+    }
+</style>
+
+<!-- New Payment Modal-->
+<div class="modal fade" id="new-payment-modal" tabindex="-1" aria-labelledby="new-payment-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="new-payment-modal-label">New Payment</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-form">
+                @using (Html.BeginForm("AddPayment", "Admin", FormMethod.Post))
+                {
+                    <div class="padMe">
+                        <input type="hidden" id="OrderID" name="OrderID" value="@myOrder!.Id" />
+
+                        <!-- Payment Type -->
+                        <div style="margin: 12px 0px;">
+                            <div class="form-space ">
+                                <div class="form-label">
+                                    Payment Type(s)
+                                </div>
+                                <select class="form-select" name="PaymentTypeID" id="PaymentTypeID">
+                                    <option>Select Payment Type</option>
+                                    @foreach (var s in paymentTypes!)
+                                    {
+                                        <option value="@s.Id">@s.Title</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Payment Amount Input -->
+                        <div>
+                            <div class="form-label">
+                                Payment Amount
+                            </div>
+                            <input type="text" id="PaymentAmount" name="PaymentAmount" class="form-control" />
+                        </div>
+
+                    </div>
+
+                    <div class="button-container">
+                        <input type="submit" class="btn btn-success" name="submitButton" value="Add Payment" />
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<body>
+    @if (TempData["AlertMsg"] != null)
+    {
+        <div class="alert alert-danger comfortable-margin align-text-center" role="alert">
+            @TempData["AlertMsg"]!.ToString()
+        </div>
+    }
+    @using (Html.BeginForm("EditOrder", "Admin", FormMethod.Post))
+    {
+        <div class="padMe">
+            <input type="hidden" id="OrderID" name="OrderID" value="@myOrder!.Id" />
+
+            <div>
+                <div class="form-label">
+                    Drop-Off Date
+                </div>
+                <span style="display:inline-flex; width:100%;">
+                    @{
+                        var date = myOrder!.DropOffDate.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
+                        var hours = myOrder!.DropOffDate.ToString("hh") ?? "12";
+                        var minutes = myOrder!.DropOffDate.ToString("mm") ?? "00";
+                        var timeOfDay = myOrder!.DropOffDate.ToString("tt", CultureInfo.InvariantCulture);
+                    }
+                    <input class="form-control date-field" type="date" id="dropOffDate" name="dropOffDate" class="form-control" value="@date" />
+                    <select class="form-control date-narrow-field" id="dropOffHour" name="dropOffHour">
+                        @foreach (var hour in SystemState.Instance.Hours)
+                        {
+                            if (hour == hours)
+                            {
+                                <option class="form-control" value="@hour" selected>@hour</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@hour">@hour</option>
+                            }
+                        }
+                    </select>
+                    <select class="form-control date-narrow-field" id="dropOffMinute" name="dropOffMinute">
+                        @foreach (var minute in SystemState.Instance.Minutes)
+                        {
+                            if (minute == minutes)
+                            {
+                                <option class="form-control" value="@minute" selected>@minute</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@minute">@minute</option>
+                            }
+                        }
+                    </select>
+                    <select class="form-control date-narrow-field" id="dropOffTimeOfDay" name="dropOffTimeOfDay">
+                        @foreach (var tod in SystemState.Instance.TimeOfDay)
+                        {
+                            if (tod == timeOfDay)
+                            {
+                                <option class="form-control" value="@tod" selected>@tod</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@tod">@tod</option>
+                            }
+                        }
+                    </select>
+                </span>
+            </div>
+
+            <!-- Estimated Completed Date Input -->
+            <div hidden="@(SystemState.Instance.FilterForNonStaff)">
+                <h3 class="top-margin">Estimated Complete Date</h3>
+                <span style="display:inline-flex; width:100%;">
+                    @{
+                        var doneDate = myOrder!.EstimatedCompleteDate.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
+                        var doneHours = myOrder!.EstimatedCompleteDate.ToString("hh") ?? "12";
+                        var doneMinutes = myOrder!.EstimatedCompleteDate.ToString("mm") ?? "00";
+                        var doneTimeOfDay = myOrder!.EstimatedCompleteDate.ToString("tt", CultureInfo.InvariantCulture);
+                    }
+                    <input class="form-control date-field" type="date" id="doneDate" name="doneDate" class="form-control" value="@doneDate" />
+                    <select class="form-control date-narrow-field" id="doneHours" name="doneHours">
+                        @foreach (var hour in SystemState.Instance.Hours)
+                        {
+                            if (hour == doneHours)
+                            {
+                                <option class="form-control" value="@hour" selected>@hour</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@hour">@hour</option>
+                            }
+                        }
+                    </select>
+                    <select class="form-control date-narrow-field" id="doneMinutes" name="doneMinutes">
+                        @foreach (var minute in SystemState.Instance.Minutes)
+                        {
+                            if (minute == doneMinutes)
+                            {
+                                <option class="form-control" value="@minute" selected>@minute</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@minute">@minute</option>
+                            }
+                        }
+                    </select>
+                    <select class="form-control date-narrow-field" id="doneTimeOfDay" name="doneTimeOfDay">
+                        @foreach (var tod in SystemState.Instance.TimeOfDay)
+                        {
+                            if (tod == doneTimeOfDay)
+                            {
+                                <option class="form-control" value="@tod" selected>@tod</option>
+                            }
+                            else
+                            {
+                                <option class="form-control" value="@tod">@tod</option>
+                            }
+                        }
+                    </select>
+                </span>
+            </div>
+
+            <!-- Order Account Selection -->
+            <div style="margin: 12px 0px;" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                <div class="form-space ">
+                    <h3 class="top-margin">Customer</h3>
+                    <select class="form-select" name="AccountID" id="AccountID" multiple>
+                        @foreach (var s in allAccounts!)
+                        {
+                            if (s.Id == myOrder.AccountId)
+                            {
+                                <option value="@s.Id" selected>@s.Customer!.FirstName @s.Customer.LastName</option>
+                            }
+                            else
+                            {
+                                <option value="@s.Id">@s.Customer!.FirstName @s.Customer.LastName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Order Status -->
+            <div style="margin: 12px 0px;" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                <div class="form-space ">
+                    <h3 class="top-margin">Order Status</h3>
+                    <select class="form-select" name="StatusID" id="StatusID">
+                        <option value="" selected>Set Order Status </option>
+                        @foreach (var s in allStatuses!)
+                        {
+                            if (s.Id == myOrder.StatusId)
+                            {
+                                <option value="@s.Id" selected>@s.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@s.Id">@s.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Amounts Paid -->
+            <div class="mb-3">
+                <h3 class="top-margin">Payments</h3>
+
+                <div class="payment-field-container" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                    <div class="add-payment-button-container">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-payment-modal">
+                            <i class="bx bx-money-withdraw"></i>
+                            <span>Add Payment</span>
+                        </button>
+                    </div>
+                    <div class="payment-balances-container">
+                        <span>
+                            <b>Amount Paid: </b> @{
+                                var trans = myOrder.MonetaryTransactions.ToList();
+                                decimal totalPaid = trans.Sum(x => x.AmountPaid);
+
+                                <span>$@totalPaid</span>
+                            }
+                        </span>
+
+                        <br />
+
+                        <span>
+                            <b>Balance Due: </b>
+                            @{
+                                var items = myOrder.OrderItems.ToList();
+                                decimal totalCost = myOrder.CalculateTotal().Total;
+                                <span>$@((totalCost - totalPaid).ToString("0.00"))</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+
+                <table class="table table-striped table-sm">
+                    <tr>
+                        <th>
+                            Payment Type
+                        </th>
+                        <th>
+                            Payment Amount
+                        </th>
+                        <th></th>
+                    </tr>
+                    @foreach (var transaction in myOrder.MonetaryTransactions)
+                    {
+                        var paymentTypeTitle = paymentTypes?.FirstOrDefault(x => x.Id == transaction.PaymentTypeId)!.Title;
+                        var loyaltyAmount = transaction.AmountPaid / 100;
+
+                        <tr>
+                            <td>
+                                @paymentTypeTitle
+                            </td>
+                            <td>
+                                @if (paymentTypeTitle!.Contains("loyalty", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    @loyaltyAmount.ToString("$0.00")
+                                }
+                                else
+                                {
+                                    @transaction.AmountPaid.ToString("$0.00")
+                                }
+                            </td>
+                            <td>
+                                <input type="text" name="orderID" value="@(myOrder.Id)" hidden />
+                                <input type="text" name="paymentID" value="@(transaction.Id)" hidden />
+                                <button name="submitButton" value="DeleteTransaction" type="submit" class="btn btn-danger" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                                    <i class='bx bxs-trash'></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <!-- Order Notes -->
+            <div class="mb-3">
+                <h3 class="top-margin">Order Notes</h3>
+                <input type="text" class="form-control" id="OrderNotes" name="OrderNotes" rows="3" value="@myOrder.Notes" />
+            </div>
+
+            <!-- Service Item Type Selection -->
+            <div style="margin: 12px 0px;">
+                <div class="form-space ">
+                    <h3 class="top-margin">Select Service Item(s)</h3>
+                    <select class="form-select" name="ServiceItemTypeID" id="ServiceItemTypeID" multiple>
+                        @foreach (var s in sIT!)
+                        {
+                            if (itemIDs.Contains(s.Id))
+                            {
+                                <option value="@s.Id" selected>@s.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@s.Id">@s.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Discount Selection -->
+            <div style="margin: 12px 0px;" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                <div class="form-space ">
+                    <div class="form-label">
+                        Select Discount(s)
+                    </div>
+                    <select class="form-select" name="DiscountItem" id="DiscountItem" multiple>
+                        @foreach (var s in allDiscounts!)
+                        {
+                            if (discountIDs.Contains(s.Id))
+                            {
+                                <option value="@s.Id" selected>@s.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@s.Id">@s.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container" style="float: left;">
+            <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+            @Html.ActionLink("Cancel", "ReadOrders", "Admin", null, new { @class = "btn btn-secondary" })
+        </div>
+        <input type="submit" class="btn btn-outline-danger" style="float: right;" name="submitButton" value="Delete" />
+    }
+</body>

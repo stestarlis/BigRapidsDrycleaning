@@ -1,0 +1,682 @@
+﻿@using BRDObjects
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<header>
+    <link rel="stylesheet" href="~/css/Settings.css" />
+    <style>
+        .full-width {
+            width: 95%;
+            margin: auto auto;
+        }
+
+        .centered {
+            margin: auto auto;
+        }
+
+        .store-info-margins {
+            margin: 10px,5px,10px,5px;
+        }
+
+        .display-none {
+            display: none;
+        }
+
+        .control-height {
+            height: 3rem;
+            text-align: top;
+        }
+    </style>
+</header>
+<body>
+    <h1>Settings</h1>
+
+    @{
+        var discType = new List<DiscountType>();
+        var meetingTypes = new List<MeetingType>();
+        var sIT = new List<ServiceItemType>();
+        var payType = new List<PaymentType>();
+        var stores = new List<Store>();
+        var storeInformationRecords = new List<StoreInformation>();
+        var storeInformationKeys = new List<StoreInformation>();
+        var storeHours = new List<HoursOfOperation>();
+
+        if (TempData["discountTypes"] != null)
+        {
+            sIT = TempData["discountTypes"] as List<ServiceItemType>;
+        }
+        if (TempData["meetingTypes"] != null)
+        {
+            meetingTypes = TempData["meetingTypes"] as List<MeetingType>;
+        }
+        if (TempData["serviceItemTypes"] != null)
+        {
+            sIT = TempData["serviceItemTypes"] as List<ServiceItemType>;
+        }
+        if (TempData["paymentType"] != null)
+        {
+            payType = TempData["paymentType"] as List<PaymentType>;
+        }
+        if (TempData["stores"] != null)
+        {
+            stores = TempData["stores"] as List<Store>;
+        }
+        if (TempData["storeInformation"] != null)
+        {
+            storeInformationRecords = TempData["storeInformation"] as List<StoreInformation>;
+        }
+        if (TempData["storeInformationKeys"] != null)
+        {
+            storeInformationKeys = TempData["storeInformationKeys"] as List<StoreInformation>;
+        }
+        if (TempData["storeHours"] != null)
+        {
+            storeHours = TempData["storeHours"] as List<HoursOfOperation>;
+        }
+    }
+
+    <div class="align-items-start tab-container">
+        <!-- Tab Controls -->
+        <div class="nav flex-row nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="secondary-tab active" id="v-pills-discount-types-tab" data-bs-toggle="pill" data-bs-target="#v-pills-discount-types" type="button" role="tab" aria-controls="v-pills-discount-types" aria-selected="true">
+                Discount Types
+            </button>
+
+            <button class="secondary-tab" id="v-pills-meeting-types-tab" data-bs-toggle="pill" data-bs-target="#v-pills-meeting-types" type="button" role="tab" aria-controls="v-pills-meeting-types" aria-selected="true">
+                Meeting Types
+            </button>
+
+            <button class="secondary-tab" id="v-pills-service-item-type-types-tab" data-bs-toggle="pill" data-bs-target="#v-pills-service-item-type-types" type="button" role="tab" aria-controls="v-pills-service-item-type-types" aria-selected="true">
+                Service Item Types
+            </button>
+
+            <button class="secondary-tab" id="v-pills-payment-type-tab" data-bs-toggle="pill" data-bs-target="#v-pills-payment-type" type="button" role="tab" aria-controls="v-pills-payment-type" aria-selected="true">
+                Payment Types
+            </button>
+
+            <button class="secondary-tab" id="v-pills-stores-tab" data-bs-toggle="pill" data-bs-target="#v-pills-stores" type="button" role="tab" aria-controls="v-pills-stores" aria-selected="true">
+                Stores
+            </button>
+
+            <button class="secondary-tab" id="v-pills-store-info-keys-tab" data-bs-toggle="pill" data-bs-target="#v-pills-store-info-keys" type="button" role="tab" aria-controls="v-pills-store-info-keys" aria-selected="true">
+                Store Information Keys
+            </button>
+
+            <button class="secondary-tab" id="v-pills-store-hours-keys-tab" data-bs-toggle="pill" data-bs-target="#v-pills-store-hours-keys" type="button" role="tab" aria-controls="v-pills-store-hours-keys" aria-selected="true">
+                Hours of Operation
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content primaryTabControlContent" id="v-pills-tabContent">
+
+            <!-- Discount Types -->
+            <div class="tab-pane fade show active secondaryTabControlContent" id="v-pills-discount-types" role="tabpanel" aria-labelledby="v-pills-discount-types-tab" tabindex="0">
+                <div class="nav flex-row nav-pills me-3" id="v-pills-discount-types-tab" role="tablist" aria-orientation="vertical">
+                    <div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Discount Type
+                                    </th>
+                                    <th>
+                                        Active Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var d in discType!)
+                                {
+                                    <tr>
+                                        <td>
+                                            @d.Title
+                                        </td>
+                                        <td>
+                                            @d.IsActive
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <br />
+
+                        <!-- Add New Discount Type -->
+                        <div style="margin-top: 16px;">
+                            <button type="button" class="btn collapsible">Add New Discount Type</button>
+                            <div class="content">
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="DiscountTypeTitle" class="form-label">Discount Type Title</label>
+                                        <input type="text" class="form-control" id="DiscountTypeTitle" name="DiscountTypeTitle" placeholder="Something... exciting!">
+                                    </div>
+                                    <!-- Service Active Status  -->
+                                    <div style="margin: 12px 0px;">
+                                        <div class="form-space">
+                                            <div class="form-label">
+                                                Set Active Status
+                                            </div>
+                                            <select class="form-select" name="DiscountActiveStatus">
+                                                <option value="true">Active</option>
+                                                <option value="false">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn" type="submit" name="submitButton" value="AddDiscountType" asp-controller="Admin" asp-action="AddNewObjectType">Add Discount Type</button>
+                                    @Html.ActionLink("Cancel", "Admin", "Index", null, new { @class = "btn-outline" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meeting Types -->
+            <div class="tab-pane fade show secondaryTabControlContent" id="v-pills-meeting-types" role="tabpanel" aria-labelledby="v-pills-meeting-types-tab" tabindex="0">
+                <div class="nav flex-row nav-pills me-3" id="v-pills-meeting-types-tab" role="tablist" aria-orientation="vertical">
+                    <div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Meeting Type Title
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in meetingTypes!)
+                                {
+                                    <tr>
+                                        <td>
+                                            @m.Title
+                                        </td>
+                                        <td>
+                                            @m.IsActive
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <br />
+
+                        <!-- Add New Meeting Type -->
+                        <div style="margin-top: 16px;">
+                            <button type="button" class="btn collapsible">Add New Meeting Type</button>
+                            <div class="content">
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="MeetingTypeTitle" class="form-label">Meeting Type Title</label>
+                                        <input type="text" class="form-control" id="MeetingTypeTitle" name="MeetingTypeTitle" placeholder="Something... exciting!">
+                                    </div>
+                                    <!-- Service Active Status  -->
+                                    <div style="margin: 12px 0px;">
+                                        <div class="form-space">
+                                            <div class="form-label">
+                                                Set Active Status
+                                            </div>
+                                            <select class="form-select" name="MeetingActiveStatus">
+                                                <option value="true">Active</option>
+                                                <option value="false">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn" type="submit" name="submitButton" value="AddMeetingType" asp-controller="Admin" asp-action="AddNewObjectType">Add Meeting Type</button>
+                                    @Html.ActionLink("Cancel", "Admin", "Index", null, new { @class = "btn-outline" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Item Types -->
+            <div class="tab-pane fade show secondaryTabControlContent" id="v-pills-service-item-type-types" role="tabpanel" aria-labelledby="v-pills-service-item-type-types-tab" tabindex="0">
+                <div class="nav flex-row nav-pills me-3" id="v-pills-service-item-type-types-tab" role="tablist" aria-orientation="vertical">
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Service Item Type Name
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in sIT!)
+                                {
+                                    <tr>
+                                        <td>
+                                            @s.Title
+                                        </td>
+                                        <td>
+                                            @s.IsActive
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <br />
+
+                        <!-- Add New Service Item Type -->
+                        <div style="margin-top: 16px;">
+                            <button type="button" class="btn collapsible">Add New Service Item Type</button>
+                            <div class="content">
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="ServiceItemTypeTitle" class="form-label">Meeting Type Title</label>
+                                        <input type="text" class="form-control" id="ServiceItemTypeTitle" name="ServiceItemTypeTitle" placeholder="Something... exciting!">
+                                    </div>
+                                    <!-- Service Active Status  -->
+                                    <div style="margin: 12px 0px;">
+                                        <div class="form-space">
+                                            <div class="form-label">
+                                                Set Active Status
+                                            </div>
+                                            <select class="form-select" name="ServiceItemTypeActiveStatus">
+                                                <option value="true">Active</option>
+                                                <option value="false">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn" type="submit" name="submitButton" value="AddServiceItemTypeTitle" asp-controller="Admin" asp-action="AddNewObjectType">Add Service Item Type</button>
+                                    @Html.ActionLink("Cancel", "Admin", "Index", null, new { @class = "btn-outline" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Type Categories -->
+            <div class="tab-pane fade show secondaryTabControlContent" id="v-pills-payment-type" role="tabpanel" aria-labelledby="v-pills-payment-type-tab" tabindex="0">
+                <div class="nav flex-row nav-pills me-3" id="v-pills-payment-type-tab" role="tablist" aria-orientation="vertical">
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Payment Type Title
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pT in payType!)
+                                {
+                                    <tr>
+                                        <td>
+                                            @pT.Title
+                                        </td>
+                                        <td>
+                                            @pT.IsActive
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <br />
+
+                        <!-- Add New Exhibitor Type -->
+                        <div style="margin-top: 16px;">
+                            <button type="button" class="btn collapsible">Add New Payment Type</button>
+                            <div class="content">
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="PaymentTypeTitle" class="form-label">Payment Type Title</label>
+                                        <input type="text" class="form-control" id="PaymentTypeTitle" name="PaymentTypeTitle" placeholder="Something... exciting!">
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn" type="submit" name="submitButton" value="AddPaymentType" asp-controller="Maintenance" asp-action="AddNewObjectType">Add Payment Type</button>
+                                    @Html.ActionLink("Cancel", "MaintenanceIndex", "Maintenance", null, new { @class = "btn-outline" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stores -->
+            <div id="v-pills-stores" class="tab-pane fade show secondaryTabControlContent">
+                <div class="tab">
+                    @foreach (var store in stores)
+                    {
+                        <button class="tablinks" onclick="openStore(event, '@store.Title')">@store.Title</button>
+                    }
+                </div>
+
+                @foreach (var store in stores)
+                {
+                    var storeInfo = storeInformationRecords?.Where(x => x.StoreId == store.Id).ToList();
+
+                    <!-- Display the store details -->
+                    <div id="@store.Title" class="tabcontent">
+                        <table class="centered full-width">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Setting Name
+                                    </th>
+                                    <th>
+                                        Setting Value
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var storeInfoRecord in storeInfo!)
+                                {
+                                    @using (Html.BeginForm("UpdateStoreInfoRecord", "Admin", FormMethod.Post))
+                                    {
+                                        <input type="text" name="storeRecordID" id="storeRecordID" value="@storeInfoRecord.Id" hidden />
+
+                                        <tr>
+                                            <td>
+                                                <select class="form-select" name="informationKey" id="informationKey">
+                                                    <option>Select Information Key</option>
+                                                    @foreach (var key in storeInformationRecords.Select(x => x.InformationKey).ToList())
+                                                    {
+                                                        <option value="@key" selected="@(key == storeInfoRecord.InformationKey)">
+                                                            @key
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control control-height" name="storeInfoValue" value="@storeInfoRecord.InformationValue" />
+                                            </td>
+                                            <td>
+                                                <div class="button-container" style="float: left;">
+                                                    <input type="submit" class="btn btn-success full-width" name="submitButton" value="Save">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } <!-- END ROW FORM -->
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Add New Store Information Record -->
+                        <div style="margin-top: 16px;">
+                            <button type="button" class="btn collapsible">Add New Store Information Record</button>
+                            <div class="content">
+                                @using (Html.BeginForm("AddStoreInformationRecord", "Admin", FormMethod.Post))
+                                {
+                                    <input type="text" hidden name="informationStoreID" value="@store.Id" />
+                                    <div>
+                                        <div class="mb-3">
+                                            <label for="Store Information Key" class="form-label">New Information Key</label>
+                                            <select class="form-select" name="informationKey" id="informationKey">
+                                                <option>Select Information Key</option>
+                                                @foreach (var key in storeInformationKeys.Select(x => x.InformationValue).Distinct().ToList())
+                                                {
+                                                    <option value="@key">
+                                                        @key
+                                                    </option>
+                                                }
+                                            </select>
+                                            <label for="Store Information Key" class="form-label">New Information Key</label>
+                                            <input type="text" required class="form-control" id="informationValue" name="informationValue" placeholder="Something else... exciting!">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn" type="submit" name="submitButton" value="AddStoreInformationKey">Add Store Information Key</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Store Info Keys -->
+            <div id="v-pills-store-info-keys" class="tab-pane fade show secondaryTabControlContent">
+                <table class="centered full-width">
+                    <thead>
+                        <tr>
+                            <th>
+                                Setting Key
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var storeInfoRecord in storeInformationKeys!.Select(x => x.InformationValue).Distinct())
+                        {
+                            <input type="text" name="storeRecordID" id="storeRecordID" value="@storeInfoRecord" hidden />
+
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control control-height" name="storeInfoValue" value="@storeInfoRecord" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <!-- Add New Store Information Key -->
+                <div style="margin-top: 16px;">
+                    <button type="button" class="btn collapsible">Add New Store Information Key</button>
+                    <div class="content">
+                        @using (Html.BeginForm("AddStoreInformationKey", "Admin", FormMethod.Post))
+                        {
+                            <div>
+                                <div class="mb-3">
+                                    <label for="Store Information Key" class="form-label">New Information Key</label>
+                                    <input type="text" required class="form-control" id="informationKey" name="informationKey" placeholder="Something... exciting!">
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn" type="submit" name="submitButton" value="AddStoreInformationKey">Add Store Information Key</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Info Keys -->
+            <div id="v-pills-store-hours-keys" class="tab-pane fade show secondaryTabControlContent">
+                <div class="tab">
+                    @foreach (var store in stores)
+                    {
+                        <button class="hourLinks" onclick="openStoreHours(event, '@store.Title')">@store.Title</button>
+                    }
+                </div>
+
+                @foreach (var store in stores)
+                {
+                    var storeInfo = storeInformationRecords?.Where(x => x.StoreId == store.Id).ToList();
+
+                    <!-- Display the store details -->
+                    <div id="@store.Title-hours" class="tabcontent">
+                        <table class="centered full-width">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Day of Week
+                                    </th>
+                                    <th>
+                                        Open Time
+                                    </th>
+                                    <th>
+                                        Close Time
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var h in storeHours.Where(x => x.StoreId == store.Id)!)
+                                {
+                                    var openVal = "";
+                                    if (h.OpenTime != null)
+                                    {
+                                        openVal = h.OpenTime.Value.ToString("HH:mm");
+                                    }
+
+                                    var closeVal = "";
+                                    if (h.CloseTime != null)
+                                    {
+                                        closeVal = h.CloseTime.Value.ToString("HH:mm");
+                                    }
+
+                                    @using (Html.BeginForm("UpdateHoursOfOperation", "Admin", FormMethod.Post))
+                                    {
+                                        <input type="text" name="storeHourID" id="storeHourID" value="@h.Id" hidden />
+
+                                        <tr>
+                                            <td>
+                                                @h.DayOfWeek
+                                            </td>
+                                            <td>
+                                                @if (openVal != null)
+                                                {
+                                                    <input type="time" class="form-control control-height" id="storeOpenTime" name="storeOpenTime" value="@openVal" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="time" class="form-control control-height" id="storeOpenTime" name="storeOpenTime" />
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (closeVal != null)
+                                                {
+                                                    <input type="time" class="form-control control-height" id="storeCloseTime" name="storeCloseTime" value="@closeVal" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="time" class="form-control control-height" id="storeCloseTime" name="storeCloseTime" />
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (closeVal == "" && openVal == "")
+                                                {
+                                                    @Html.CheckBox("closedCheck", true)
+                                                    <label for="closedCheck">Closed</label>
+                                                } else
+                                                {
+                                                    @Html.CheckBox("closedCheck")
+                                                    <label for="closedCheck">Closed</label>
+                                                }    
+                                            </td>
+                                            <td>
+                                                <div class="button-container" style="float: left;">
+                                                    <input type="submit" class="btn btn-success full-width" name="submitButton" value="Save">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } <!-- END ROW FORM -->
+                                }
+                            </tbody>
+                        </table>
+
+                        <br />
+
+                        @using (Html.BeginForm("CreateHoursOfOperation", "Admin", FormMethod.Post))
+                        {
+                            <button type="button" class="collapsible">Add Hours Of Operation</button>
+
+                            <div class="content">
+                                <input type="hidden" value="@store.Id" name="storeId" id="storeId" />
+
+                                <select class="form-select" aria-label="Day of Week input" id="dayOfWeek" name="dayOfWeek">
+                                    <option selected>Select Day of Week</option>
+                                    <option value="Sunday">Sunday</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+
+                                <div>
+                                    <label>
+                                        Open Time:
+                                        <input type="time" class="form-control control-height" id="storeOpenTime" name="storeOpenTime" />
+                                    </label>
+                                    <label>
+                                        Close Time:
+                                        <input type="time" class="form-control control-height" id="storeCloseTime" name="storeCloseTime" />
+                                    </label>
+                                </div>
+
+                                <div class="button-container" style="float: left;">
+                                    <input type="submit" class="btn btn-success full-width" name="submitButton" value="Save">
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <script>
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            function openStore(evt, storeName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(storeName).style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+
+            function openStoreHours(evt, storeName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("hourLinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(storeName + '-hours').style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+
+            var activeLink = document.getElementsByClassName("tablinks");
+            activeLink[0].click();
+            var activeLink = document.getElementsByClassName("hourLinks");
+            activeLink[0].click();
+
+            function setValue(control, val) {
+                control.value = val;
+                //document.getElementById("myTime").value = "22:53:05";
+
+            }
+        </script>
+</body>

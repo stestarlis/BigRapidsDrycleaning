@@ -1,0 +1,227 @@
+﻿@using BRDObjects
+@{
+    var appointments = TempData["Appointments"] as List<ScheduleEntry>;
+    var showPastEntries = (bool?)TempData["ShowPastValues"]! ?? true;
+}
+<body>
+    <h1> Appointments </h1>
+    @if (TempData["AlertMsg"] != null)
+    {
+        <div class="alert alert-danger comfortable-margin align-text-center" role="alert">
+            @TempData["AlertMsg"]!.ToString()
+        </div>
+    }
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-modal">
+            New Appointment
+        </button>
+        @using (Html.BeginForm("ToggleShowPastAppointments", "Admin", FormMethod.Post))
+        {
+            @Html.Hidden("showPastValues", !showPastEntries)
+            <input type="submit" class="btn btn-outline-secondary" style="height: 100%; margin-left: 15px;" name="submitButton" value="Hide Past Entries" hidden="@(showPastEntries)" />
+            <input type="submit" class="btn  btn-outline-secondary" style="height: 100%; margin-left: 15px;" name="submitButton" value="Show Past Entries" hidden="@(!showPastEntries)" />
+        }
+        <div style="margin: 4px; max-width: 250px;">
+            <input type="text" class="form-control" style="height: 100%; margin-left: 15px;" id="mySearch" onkeyup="searchGrid()" placeholder="Search..." title="Type in a category">
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div>
+        <!-- New Appointment Modal-->
+        <div class="modal fade" id="new-modal" tabindex="-1" aria-labelledby="new-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="new-modal-label">New Appointment</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-form">
+                        @using (Html.BeginForm("CreateAppointment", "Admin", FormMethod.Post))
+                        {
+                            <div style="margin:8px;">
+                                <!-- Appointment Title -->
+                                <div>
+                                    <div>
+                                        <div class="form-label">
+                                            Appointment Start
+                                        </div>
+                                        <span style="display:inline-flex; width:100%;">
+                                            <input type="datetime-local" id="meetingStart" name="meetingStart" class="form-control" required />
+                                        </span>
+                                        <div class="form-label">
+                                            Appointment End
+                                        </div>
+                                        <span style="display:inline-flex; width:100%;">
+                                            <input type="time" id="meetingEnd" name="meetingEnd" class="form-control" required />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Appointment Customer Info -->
+                                @if (!SystemState.Instance.FilterForNonStaff)
+                                {
+                                    <div>
+                                        <div class="form-label">
+                                            Customer First Name
+                                        </div>
+                                        <input type="text" class="form-control" id="customerFirstName" name="CustomerFirstName" value="" required>
+
+                                        <div class="form-label">
+                                            Customer Last Name
+                                        </div>
+                                        <input type="text" class="form-control" id="customerLastName" name="CustomerLastName" value="" required>
+                                    </div>
+                                }
+                                <!-- Appointment Notes -->
+                                <div>
+                                    <div class="form-label">
+                                        Notes
+                                    </div>
+                                    <input type="text" class="form-control" id="appointmentNotes" name="AppointmentNotes" value="">
+                                </div>
+
+                                <!-- Appointment Type -->
+                                <div class="form-space">
+                                    <div class="form-label">
+                                        Appointment Type
+                                    </div>
+                                    @{
+                                        var meetingTypes = TempData["MeetingTypes"] as List<MeetingType> ?? new();
+                                    }
+                                    <select class="form-select" name="meetingType" id="MeetingType">
+                                        @foreach (var meetingType in meetingTypes)
+                                        {
+                                            <option value="@meetingType.Id">@meetingType.Title</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Appointment Purpose -->
+                                <div class="form-space">
+                                    <div class="form-label">
+                                        Appointment Purpose
+                                    </div>
+                                    @{
+                                        var meetingPurposes = TempData["MeetingPurposes"] as List<MeetingPurpose> ?? new();
+                                    }
+                                    <select class="form-select" name="meetingPurpose" id="MeetingPurposeID">
+                                        @foreach (var meetingPurpose in meetingPurposes)
+                                        {
+                                            <option value="@meetingPurpose.Id">@meetingPurpose.Title</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="button-container">
+                                    <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div>
+        <!-- Populate the table with data from the database -->
+        @if (appointments != null || appointments?.Count > 0)
+        {
+            <table class="table table-striped table-sm">
+                @if (!showPastEntries)
+                {
+                    <thead>
+                        <tr>
+                            <th scope="col">Appt. Purpose</th>
+                            <th scope="col">Appt. Type</th>
+                            <th scope="col">Appt. Date</th>
+                            <th scope="col">Customer</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchableGrid">
+                        @foreach (var appointment in appointments!
+                       .OrderBy(x => x.MeetingStart)
+                       .ToList())
+                        {
+                            <tr>
+                                <td>@(appointment.MeetingPurpose?.Title ?? "Purpose")</td>
+                                <td>@(appointment.MeetingType?.Title ?? "Type")</td>
+                                <td>@appointment.MeetingStart.Value.ToString("MM/dd/yy hh:mm tt") - @appointment.MeetingEnd.Value.ToString("hh:mm tt")</td>
+                                <td><span>@appointment.Account?.Customer?.LastName, @appointment.Account?.Customer?.FirstName</span></td>
+                                <td>
+                                    @using (Html.BeginForm("LoadEditAppointment", "Admin", FormMethod.Post))
+                                    {
+                                        var isPastAppt = appointment.MeetingStart < DateTime.Now;
+                                        <input type="text" name="appointmentID" value="@appointment.Id" hidden />
+                                        <input type="text" name="customerName" value="@($"{@appointment.Account?.Customer?.LastName}, {@appointment.Account?.Customer?.FirstName}")" hidden />
+                                        <button type="submit" title="@(isPastAppt ? "Cannot edit past appointment" : string.Empty)" class="btn btn-outline-secondary" disabled="@isPastAppt">Edit</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+                else
+                {
+                    var currentAppt = appointments!
+                    .Where(x => x.MeetingStart >= DateTime.Now)
+                    .OrderBy(x => x.MeetingStart)
+                    .ToList();
+                    @if (currentAppt.Count > 0)
+                    {
+                        <thead>
+                            <tr>
+                                <th scope="col">Appt. Purpose</th>
+                                <th scope="col">Appt. Type</th>
+                                <th scope="col">Appt. Date</th>
+                                <th scope="col">Customer</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchableGrid">
+
+                            @foreach (var appointment in currentAppt)
+                            {
+                                <tr>
+
+                                    <td>@(appointment.MeetingPurpose!.Title ?? string.Empty)</td>
+                                    <td>@(appointment.MeetingType!.Title ?? string.Empty)</td>
+                                    <td>@appointment.MeetingStart.Value.ToString("MM/dd/yy hh:mm tt") - @appointment.MeetingEnd.Value.ToString("hh:mm tt")</td>
+                                    <td><span>@appointment.Account?.Customer?.LastName, @appointment.Account?.Customer?.FirstName</span></td>
+                                    <td>
+                                        @using (Html.BeginForm("LoadEditAppointment", "Admin", FormMethod.Post))
+                                        {
+                                            <input type="text" name="appointmentID" value="@appointment.Id" hidden />
+                                            <input type="text" name="meetingTypeID" value="@appointment.MeetingTypeId" hidden />
+                                            <input type="text" name="meetingPurposeID" value="@appointment.MeetingPurposeId" hidden />
+                                            <button type="submit" class="btn btn-outline-secondary">Details</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+                        <partial>
+                            @Html.Partial("_EmptySplash")
+                        </partial>
+                    }
+                }
+            </table>
+        }
+        else
+        {
+            TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+            <partial>
+                @Html.Partial("_EmptySplash")
+            </partial>
+        }
+    </div>
+</body>

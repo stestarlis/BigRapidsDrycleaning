@@ -1,0 +1,362 @@
+﻿@using BRDObjects
+@{
+    ViewData["Title"] = "Home Page";
+
+    var services = TempData["Services"] as List<Service>;
+    var stores = TempData["Stores"] as List<Store>;
+    var storeInfo = TempData["StoreInfo"] as List<StoreInformation>;
+    var storeHours = TempData["StoreHours"] as List<HoursOfOperation>;
+}
+<header>
+    <link href="~/css/Index.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        .front-page-contact-form {
+            margin: 0 auto;
+            width: 400px;
+        }
+
+        .center-form-title {
+            text-align: center;
+        }
+    </style>
+</header>
+<body>
+    <!-- Hero Image -->
+    <section class="py-5 text-center container" style="background-image: url('imgs/laundry.jpg'); background-size: cover;">
+        <div class="row py-lg-5">
+            <div class="col-lg-6 col-md-8 mx-auto heroImageText">
+                <h1 class="fw-light">Big Rapids Dry Cleaning</h1>
+                <p class="lead text-body-secondary">Free courses on hanger management!</p>
+                <p>
+                    <a href="#services" class="btn btn-primary my-2">Our Services</a>
+                    <a href="#" class="btn btn-secondary my-2">About Us</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Store Details -->
+    <div class="album py-5 bg-body-tertiary">
+        <div class="container">
+            <div class="row">
+                <div id="carouselExample" class="col carousel slide">
+
+                    <!-- Item Indicators -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+
+                    <!-- Carousel Content -->
+                    <div class="carousel-inner">
+                        <!-- Location Cards -->
+                        @foreach (var store in stores!)
+                        {
+                            var deets = storeInfo.Where(x => x.StoreId == store.Id).ToList();
+                            var address = store.Address.AddressLine1 + " " + store.Address.AddressLine2 + ", " + store.Address.City + ", " + store.Address.State + store.Address.PostalCode;
+                            var mapSource = "https://maps.google.com/maps?q=" + @address + "&output=embed";
+
+                            <div class="container carousel-item">
+                                <div class="row row-cols-1 row-cols-md-3 g-1" id="storeCarousel">
+
+                                    <div class="col">
+                                        <div class="card shadow-sm card-body">
+                                            <!-- Store Name -->
+                                            <div class="text-center">
+                                                <h1>@store.Title</h1>
+                                                <b>Let's get in touch</b>
+                                            </div>
+
+                                            <!-- Store Socials -->
+                                            <div class="text-center">
+
+                                                <!-- Location Info -->
+                                                <span class="card-text">
+                                                    <i class='bx bxs-map'></i>
+                                                    @address
+                                                </span>
+
+                                                <br />
+
+                                                <!-- Social and Contact Info -->
+                                                @foreach (var item in deets)
+                                                {
+                                                    switch (item.InformationKey)
+                                                    {
+                                                        case "PhoneNumber":
+                                                            <br />
+                                                            <span class="card-text">
+                                                                <i class='bx bxs-phone-call'></i>
+                                                                @item.InformationValue
+                                                            </span>
+                                                            break;
+                                                        case "FacebookLink":
+                                                            <a class="social-link" href="@item.InformationValue">
+                                                                <i class='bx bxl-facebook-square'></i>
+                                                            </a>
+                                                            break;
+                                                        case "TwitterLink":
+                                                            <a class="social-link" href="@item.InformationValue">
+                                                                <i class='bx bxl-twitter'></i>
+                                                            </a>
+                                                            break;
+                                                        case "Instagram":
+                                                            <a class="social-link" href="@item.InformationValue">
+                                                                <i class='bx bxl-instagram'></i>
+                                                            </a>
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                                <br />
+
+                                            </div>
+
+                                            <!-- Store Map -->
+                                            <div class="storeMap">
+                                                <iframe width="100%" height="225" frameborder="0" scrolling="no" marginheight="0"
+                                                        marginwidth="0" style="width: 100%" src="@mapSource">
+                                                    <a href="https://www.gps.ie/">gps devices</a>
+                                                </iframe>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hours Of Operation -->
+                                    <div class="col">
+                                        <div class="card shadow-sm card-body">
+
+                                            <!-- Hours of Operation -->
+                                            <div class="text-center">
+                                                <b>Hours of Operation</b>
+                                            </div>
+                                            <table id="tablehours">
+                                                @if (storeHours?.Count > 0)
+                                                {
+                                                    var sH = storeHours.Where(x => x.StoreId == store.Id).ToList();
+                                                    @for (int i = 0; i < sH.Count(); i++)
+                                                    {
+                                                        <tr>
+                                                            <td>@sH?[i].DayOfWeek</td>
+                                                            @if (sH?[i].OpenTime != null)
+                                                            {
+                                                                <td>@sH[i].OpenTime - @sH[i].CloseTime</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>Closed</td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td>This location is temporarily closed</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                            <div class="text-center">
+                                                <i><small>Note: Hours may vary for holidays and events</small></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- About Us -->
+                                    <div class="col">
+                                        <div class="card shadow-sm card-body">
+                                            <div class="text-center">
+                                                <b>About Us</b>
+                                            </div>
+                                            <p class="card-text">
+                                                @if (storeInfo.FirstOrDefault(x => x.InformationKey.Equals("AboutUs") && x.StoreId == store.Id) != null)
+                                                {
+                                                    <span>@storeInfo.FirstOrDefault(x => x.InformationKey.Equals("AboutUs") && x.StoreId == store.Id).InformationValue</span>
+                                                    <br />
+                                                }
+                                                @if (storeInfo.FirstOrDefault(x => x.InformationKey.Equals("AboutUsSecondParagraph") && x.StoreId == store.Id) != null)
+                                                {
+                                                    <br />
+                                                    <span>@storeInfo.FirstOrDefault(x => x.InformationKey.Equals("AboutUsSecondParagraph") && x.StoreId == store.Id).InformationValue</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <button class="carousel-control-prev carousel-button" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                        <i class='bx bx-chevron-left'></i>
+                    </button>
+
+                    <button class="carousel-control-next carousel-button" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                        <i class='bx bx-chevron-right'></i>
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- Services and Pricing -->
+    <div>
+        <h1>Services and Pricing</h1>
+
+        <!-- Create a seperate tab for each store -->
+        <div class="tab" id="services">
+            @foreach (var store in stores!)
+            {
+                <button class="tablinks" onclick="openTab(event, '@store.Title')">@store.Title</button>
+            }
+        </div>
+
+        <!-- Create the tab content for each store-->
+        @foreach (var store in stores!)
+        {
+            <div id="@store.Title" class="tabcontent">
+                <h3>@store.Title Services and Pricing</h3>
+                <br />
+
+                <div class="serviceContainer">
+                    <div class="row row-cols-1 row-cols-sm-2 g-4" style="margin-top: 8px;">
+                        @{
+                            var storeServices = services!.Where(x => x.StoreId == store.Id);
+                        }
+                        @foreach (var item in storeServices!)
+                        {
+                            <div class="col d-flex flex-column">
+                                <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary fs-4 rounded-3 serviceTitle">
+                                    <h4 class="fw-semibold mb-0 text-body-emphasis">
+                                        @item.Title
+                                    </h4>
+                                </div>
+                                <div class="tableContainer">
+                                    <table class="servicePricing">
+                                        @{
+                                            var serviceItems = item.ServiceItemTypes.ToList() ?? new();
+
+                                            if (serviceItems.Count != 0)
+                                            {
+                                                if (serviceItems.Count < 5)
+                                                {
+                                                    @for (int i = 0; i < serviceItems.Count; i++)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @serviceItems[i].Title
+                                                            </td>
+                                                            <td>
+                                                                @serviceItems[i].Price.ToString("C")
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // Only want to show the first 5
+                                                    @for (int i = 0; i <= 5; i++)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                @serviceItems[i].Title
+                                                            </td>
+                                                            <td>
+                                                                @serviceItems[i].Price.ToString("C")
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            }
+                                            <tr>
+                                                <td>
+                                                    <em> Call for more info!</em>
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+                <br />
+                <small><i>Prices and services subject to change - please call ahead or visit our location for up-to-date information </i></small>
+            </div>
+        }
+    </div>
+
+    <hr />
+
+    <!-- Contact Form -->
+    <div class="front-page-contact-form">
+        <form class="form">
+            <label>
+                <h2 class="center-form-title">Let's get in touch!</h2>
+            </label>
+            <label>
+                <input required="" placeholder="" type="text" class="input" required>
+                <span>Name</span>
+            </label>
+
+            <label>
+                <input required="" placeholder="" type="email" class="input" required>
+                <span>Email</span>
+            </label>
+
+            <label>
+                <input required="" type="tel" placeholder="" class="input">
+                <span>Phone <i>(Optional)</i></span>
+            </label>
+
+            <label>
+                <textarea required="" rows="3" placeholder="" class="input01"></textarea>
+                <span>Message</span>
+            </label>
+
+            <button class="fancy" href="#">
+                <span class="top-key"></span>
+                <span class="text">submit</span>
+                <span class="bottom-key-1"></span>
+                <span class="bottom-key-2"></span>
+            </button>
+        </form>
+    </div>
+
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        var activeLink = document.getElementsByClassName("tablinks");
+        activeLink[0].click();
+
+        var activeCarousel = document.getElementsByClassName("carousel-item");
+        activeCarousel[0].classList.toggle('active');
+
+    </script>
+</body>

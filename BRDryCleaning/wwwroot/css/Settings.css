@@ -1,0 +1,132 @@
+﻿body {
+    color: black;
+}
+
+.maintenance {
+    background-color: white !important;
+    padding: 12px;
+}
+
+.active {
+    background-color: var(--brdc-blue2) !important;
+    border: none !important;
+}
+
+/* The Tabs */
+.secondary-tab {
+    background-color: transparent;
+    border: 1px solid var(--brdc-blue1);
+    font-size: 16px;
+    border-radius: 4px 4px 0px 0px;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+    .secondary-tab:active {
+        background-color: var(--brdc-blue2) !important;
+    }
+
+    .secondary-tab:hover {
+        background-color: var(--brdc-blue2) !important;
+        border: 1px solid var(--brdc-blue2);
+    }
+
+/* Table Styling */
+table {
+    background: white;
+    padding: 16px;
+    width: auto;
+    position: relative;
+    margin: 12px;
+    border: 1px solid lightgrey;
+}
+
+    table tr:nth-child(even) {
+        background-color: var(--brdc-blue1);
+    }
+
+    table thead th {
+        position: sticky;
+    }
+
+    table thead tr {
+        font-size: 16px;
+        border-bottom: 2px solid var(--brdc-blue1);
+    }
+
+    table tbody tr {
+        padding: 12px;
+    }
+
+    table td, table th {
+        padding: 12px;
+    }
+
+/* Tab Controls Styling */
+.main-tab {
+    font-size: 20px;
+}
+
+.tab-container {
+    padding: 16px;
+    border-radius: 8px;
+    background-color: white;
+    color: black;
+}
+
+/* Holds The Tab Content */
+.primaryTabControlContent {
+    margin-top: 12px;
+}
+
+/* Holds the Content */
+.secondaryTabControlContent {
+    background-color: white !important;
+    border: 1px solid var(--brdc-blue2) !important;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.collapseContent {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.content {
+    background-color: white;
+    border: 1px solid lightgrey;
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.form-space {
+    margin: 4px 0px;
+}
+
+.btn {
+    background-color: var(--brdc-blue3);
+    color: white !important;
+    border: none;
+}
+
+    .btn:hover {
+        background-color: var(--brdc-blue2);
+    }
+
+.btn-outline {
+    border: 1px solid var(--brdc-blue2);
+    vertical-align: middle;
+    padding: 6px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--brdc-blue2);
+}
+
+    .btn-outline:hover {
+        border: 1px solid var(--brdc-orange2) !important;
+        color: var(--brdc-orange2);
+    }

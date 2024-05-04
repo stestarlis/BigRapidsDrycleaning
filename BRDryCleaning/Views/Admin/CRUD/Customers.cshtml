@@ -1,0 +1,145 @@
+@page
+@using BRDObjects
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    #region MODALS
+    <!-- New Customer Modal -->
+    <div class="modal fade" id="new-modal" tabindex="-1" aria-labelledby="new-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="new-modal-label">New Customer</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-form">
+                    @using (Html.BeginForm("CreateCustomer", "Admin", FormMethod.Post))
+                    {
+                        <div class="padMe">
+                            <!-- customer Title -->
+                            <div style="display:inline-flex;">
+                                <div style="display:inline-flex; white-space: nowrap; ">
+                                    First Name: &nbsp; <input type="text" class="form-control" id="customerFName" name="CustomerFName" value="" placeholder=""> &nbsp;
+                                </div>
+                                <div style="display:inline-flex; white-space: nowrap; ">
+                                    Last Name: &nbsp; <input type="text" class="form-control" id="customerLName" name="CustomerLName" value="" placeholder="">
+                                </div>
+                            </div>
+
+                            <!-- Customer Phone -->
+                            <div>
+                                <div class="form-label">
+                                    Customer Phone Number
+                                </div>
+                                <div class="input-group">
+                                    <input type="tel" class="form-control" id="customerPhone" name="CustomerPhone" value="">
+                                </div>
+                            </div>
+
+                            <!-- Customer Phone -->
+                            <div>
+                                <div class="form-label">
+                                    Customer Email
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="customerEmail" name="CustomerEmail" value="">
+                                </div>
+                            </div>
+
+                            <!-- customer Active Status  -->
+                            <div class="form-space">
+                                <div class="form-label">
+                                    Customer Status
+                                </div>
+                                <select class="form-select" name="customerActiveStatus" id="customerActiveStatus">
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="button-container">
+                            <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    #endregion
+
+    <body>
+        <h1>
+            Customers
+        </h1>
+
+        <!-- Top Toolbar -->
+        <div class="toolbar">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-modal">
+                New Customer
+            </button>
+            <div style="margin: 4px; max-width: 250px;">
+                <input type="text" class="form-control" style="height: 100%; margin-left: 15px;" id="mySearch" onkeyup="searchGrid()" placeholder="Search..." title="Type in a category">
+            </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="tableContainer">
+            @if (TempData["AllCustomers"] != null)
+            {
+                var customers = TempData["AllCustomers"] as List<Customer>;
+                if (customers!.Count() > 0)
+                {
+                    <table 
+                           class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Address</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Phone Number</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchableGrid">
+                            @foreach (var customer in customers!)
+                            {
+                                using (Html.BeginForm("LoadEditCustomer", "Admin", FormMethod.Post))
+                                {
+                                    <tr>
+                                        <td>@customer.FirstName @customer.LastName</td>
+                                        <td>
+                                            <div>
+                                                @customer.Address?.AddressLine1
+                                                @customer.Address?.AddressLine2
+                                                @customer.Address?.AddressLine3
+                                                @customer.Address?.City, @customer.Address?.State, @customer.Address?.PostalCode, @customer.Address?.Country
+                                            </div>
+                                        </td>
+                                        <td>@customer.EmailAddress</td>
+                                        <td>@customer.PhoneNumber</td>
+                                        <td>
+                                            <input type="text" name="CustomerID" value="@customer.Id" hidden />
+                                            <button type="submit" class="btn btn-outline-secondary">
+                                                View/Edit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+                    <partial>
+                        @Html.Partial("_EmptySplash")
+                    </partial>
+                }
+            }
+        </div>
+    </body>
+}

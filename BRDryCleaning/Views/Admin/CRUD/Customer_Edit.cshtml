@@ -1,0 +1,144 @@
+﻿@using BRDObjects
+@using BRDrycleaningDataAccess
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var customerID = TempData["CustomerID"] as int? ?? -1;
+    var customer = DataHooks.Instance.GetCustomerByID(customerID);
+    var meetingPurposes = DataHooks.Instance.GetAllMeetingPurposes();
+    var meetingTypes = DataHooks.Instance.GetAllMeetingTypes();
+    var securityRoles = DataHooks.Instance.GetAllSecurityRoles();
+}
+<style>
+    .field-padding {
+        margin-bottom: 15px;
+    }
+</style>
+
+<body>
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-order-modal">
+            New Order
+        </button>
+
+        <div style="margin: 4px; max-width: 250px;">
+            <input type="text" class="form-control" id="mySearch" onkeyup="searchGrid()" placeholder="Search..." title="Type in a category">
+        </div>
+    </div>
+
+    <h2>Editing @customer?.FirstName @customer?.LastName</h2>
+    <div class="modal-form">
+        @using (Html.BeginForm("UpdateCustomer", "Admin", FormMethod.Post))
+        {
+            <input type="password" name="CustomerID" id="CustomerID" value="@customer.Id" hidden />
+            <div class="padMe">
+                <!-- customer Title -->
+                <div>
+                    First Name: &nbsp; <input type="text" class="form-control" id="firstName" name="firstName" value="@customer.FirstName" placeholder=""> &nbsp;
+                    Last Name: &nbsp; <input type="text" class="form-control" id="lastName" name="lastName" value="@customer.LastName" placeholder="">
+                </div>
+
+                <!-- Customer Phone -->
+                <div>
+                    <div class="form-label">
+                        Phone Number
+                    </div>
+                    <div class="input-group">
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="@customer.PhoneNumber">
+                    </div>
+                </div>
+
+                <!-- Customer Phone -->
+                <div>
+                    <div class="form-label">
+                        Email
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="email" name="email" value="@customer.EmailAddress">
+                    </div>
+                </div>
+
+                <!-- Customer Password -->
+                <div>
+                    <div class="form-label">
+                        Password
+                    </div>
+                    <input type="password" placeholder="Password" class="form-control" id="password" name="password" value="@customer.TemporaryPassword">
+
+                    <div class="form-label">
+                        Confirm Password
+                    </div>
+                    <input type="password" placeholder="Confirm Password" class="form-control" id="confirmPassword" name="confirmPassword" value="@customer.ConfirmPassword">
+                </div>
+
+                <!-- customer Active Status  -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Customer Status
+                    </div>
+                    <select class="form-select" name="customerActiveStatus" id="customerActiveStatus">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Loyalty  -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Loyalty Points
+                    </div>
+                    <input type="text" placeholder="Loyalty Points" class="form-control" id="loyaltyPoints" name="loyaltyPoints" value="@customer.Accounts.Sum(x => x.LoyaltyPoints)">
+                </div>
+
+                <!-- Security role  -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Security Role
+                    </div>
+                    <select class="form-select" name="customerSecurityRole" id="customerSecurityRole">
+                        @foreach (var role in securityRoles)
+                        {
+                            <option value="@role.Id" selected="@(customer.Accounts.First().SecurityRoleId == role.Id)">@role.Title</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                <button type="submit" class="btn btn-outline-secondary" value="Cancel">Cancel</button>
+            </div>
+        }
+    </div>
+
+    <h2>Customer Address</h2>
+    <div class="modal-form">
+        @using (Html.BeginForm("SaveCustomerAddress", "Admin", FormMethod.Post))
+        {
+            var account = customer.Accounts.FirstOrDefault();
+            var address = customer.Address;
+
+            <input type="text" class="form-control" name="customerID" value="@customer.Id" hidden />
+            <input type="text" class="form-control" name="addressID" value="@address?.Id" hidden />
+
+            <div class="form-label">Address Line 1</div>
+            <input type="text" class="form-control field-padding" name="addressLine1" value="@address?.AddressLine1" />
+            <div class="form-label">Address Line 2</div>
+            <input type="text" class="form-control field-padding" name="addressLine2" value="@address?.AddressLine2" />
+            <div class="form-label">Address Line 3</div>
+            <input type="text" class="form-control field-padding" name="addressLine3" value="@address?.AddressLine3" />
+            <div class="form-label">City</div>
+            <input type="text" class="form-control field-padding" name="city" value="@address?.City" />
+            <div class="form-label">State</div>
+            <input type="text" class="form-control field-padding" name="state" value="@address?.State" />
+            <div class="form-label">Country</div>
+            <input type="text" class="form-control field-padding" name="country" value="@address?.Country" />
+            <div class="form-label">Postal Code</div>
+            <input type="text" class="form-control field-padding" name="postalCode" value="@address?.PostalCode" />
+
+            <input type="submit" class="btn btn-success" name="submitButton" value="Save Address" />
+        }
+    </div>
+</body>

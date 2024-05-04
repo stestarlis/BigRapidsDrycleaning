@@ -1,0 +1,321 @@
+﻿@page
+@using BRDObjects
+@using BRDrycleaningDataAccess
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var allAccounts = TempData["Accounts"] as List<Account>;
+    var allStatuses = TempData["Statuses"] as List<RecordStatus>;
+    var allDiscounts = TempData["Discounts"] as List<Discount>;
+    var allServiceItemTypes = TempData["ServiceItemTypes"] as List<ServiceItemType>;
+    var paymentTypes = TempData["PaymentTypes"] as List<PaymentType>;
+    int addPaymentOrder = 1;
+}
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
+    <link href="~/css/Admin.css" rel="stylesheet" />
+    <title>Orders</title>
+</head>
+
+<body>
+    <h1> Orders </h1>
+
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-order-modal">
+            New Order
+        </button>
+
+        <div style="margin: 4px; max-width: 250px;">
+            <input type="text" class="form-control" id="mySearch" onkeyup="searchGrid()" placeholder="Search..." title="Type in a category">
+        </div>
+    </div>
+
+    <!-- New Order Modal-->
+    <div class="modal fade" id="new-order-modal" tabindex="-1" aria-labelledby="new-order-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="new-order-modal-label">New order</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-form">
+                    @using (Html.BeginForm("CreateOrder", "Admin", FormMethod.Post))
+                    {
+                        <div class="padMe">
+                            <!-- Order Drop Off Date Input -->
+                            <div>
+                                <div class="form-label">
+                                    Drop-Off Date
+                                </div>
+                                <span style="display:inline-flex; width:100%;">
+                                    @{
+                                        var date = DateTime.Now.ToString("yyyy-MM-dd");
+                                        var hours = "12";
+                                        var minutes = "00";
+                                        var timeOfDay = "AM";
+                                    }
+                                    <input class="form-control date-field" type="date" id="dropOffDate" name="dropOffDate" class="form-control" value="@date" />
+                                    <select class="form-control date-narrow-field" id="dropOffHour" name="dropOffHour">
+                                        @foreach (var hour in SystemState.Instance.Hours)
+                                        {
+                                            if (hour == hours)
+                                            {
+                                                <option class="form-control" value="@hour" selected>@hour</option>
+                                            }
+                                            else
+                                            {
+                                                <option class="form-control" value="@hour">@hour</option>
+                                            }
+                                        }
+                                    </select>
+                                    <select class="form-control date-narrow-field" id="dropOffMinute" name="dropOffMinute">
+                                        @foreach (var minute in SystemState.Instance.Minutes)
+                                        {
+                                            if (minute == minutes)
+                                            {
+                                                <option class="form-control" value="@minute" selected>@minute</option>
+                                            }
+                                            else
+                                            {
+                                                <option class="form-control" value="@minute">@minute</option>
+                                            }
+                                        }
+                                    </select>
+                                    <select class="form-control date-narrow-field" id="dropOffTimeOfDay" name="dropOffTimeOfDay">
+                                        @foreach (var tod in SystemState.Instance.TimeOfDay)
+                                        {
+                                            if (tod == timeOfDay)
+                                            {
+                                                <option class="form-control" value="@tod" selected>@tod</option>
+                                            }
+                                            else
+                                            {
+                                                <option class="form-control" value="@tod">@tod</option>
+                                            }
+                                        }
+                                    </select>
+                                </span>
+                            </div>
+
+                            <!-- Estimated Completed Date Input -->
+                            <div hidden="@(SystemState.Instance.FilterForNonStaff)">
+                                <div class="form-label">
+                                    Estimated Complete Date
+                                </div>
+                                <div>
+                                    <div class="form-label">
+                                        Drop-Off Date
+                                    </div>
+                                    <span style="display:inline-flex; width:100%;">
+                                        @{
+                                            var doneDate = DateTime.Now.ToString("yyyy-MM-dd");
+                                            var doneHours = "12";
+                                            var doneMinutes = "00";
+                                            var doneTimeOfDay = "AM";
+                                        }
+                                        <input class="form-control date-field" type="date" id="finishedDate" name="finishedDate" class="form-control" value="@doneDate" />
+                                        <select class="form-control date-narrow-field" id="finishedHour" name="finishedHour">
+                                            @foreach (var hour in SystemState.Instance.Hours)
+                                            {
+                                                if (hour == hours)
+                                                {
+                                                    <option class="form-control" value="@doneHours" selected>@doneHours</option>
+                                                }
+                                                else
+                                                {
+                                                    <option class="form-control" value="@doneHours">@doneHours</option>
+                                                }
+                                            }
+                                        </select>
+                                        <select class="form-control date-narrow-field" id="finishedMinute" name="finishedMinute">
+                                            @foreach (var minute in SystemState.Instance.Minutes)
+                                            {
+                                                if (minute == minutes)
+                                                {
+                                                    <option class="form-control" value="@doneMinutes" selected>@doneMinutes</option>
+                                                }
+                                                else
+                                                {
+                                                    <option class="form-control" value="@doneMinutes">@doneMinutes</option>
+                                                }
+                                            }
+                                        </select>
+                                        <select class="form-control date-narrow-field" id="finishedTimeOfDay" name="finishedTimeOfDay">
+                                            @foreach (var tod in SystemState.Instance.TimeOfDay)
+                                            {
+                                                if (tod == timeOfDay)
+                                                {
+                                                    <option class="form-control" value="@doneTimeOfDay" selected>@doneTimeOfDay</option>
+                                                }
+                                                else
+                                                {
+                                                    <option class="form-control" value="@doneTimeOfDay">@doneTimeOfDay</option>
+                                                }
+                                            }
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Order Account Selection -->
+                            @if (!SystemState.Instance.FilterForNonStaff)
+                            {
+                                <div style="margin: 12px 0px;">
+                                    <div class="form-space ">
+                                        <div class="form-label">
+                                            Customer
+                                        </div>
+                                        <select class="form-select" name="AccountID" id="AccountID" multiple>
+                                            <option value="" selected>Select Customer</option>
+                                            @foreach (var account in allAccounts!)
+                                            {
+                                                <option value="@account.Id">@account.Customer!.FirstName @account.Customer.LastName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Order Status -->
+                            <div style="margin: 12px 0px;" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                                <div class="form-space ">
+                                    <div class="form-label">
+                                        Order Status
+                                    </div>
+                                    <select class="form-select" name="StatusID" id="StatusID">
+                                        <option value="" selected>Set Order Status </option>
+                                        @foreach (var status in allStatuses!)
+                                        {
+                                            <option value="@status.Id">@status.Title</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Order Notes -->
+                            <div class="mb-3">
+                                <label for="OrderNotes" class="form-label">Order Notes</label>
+                                <textarea class="form-control" id="OrderNotes" name="OrderNotes" rows="3"></textarea>
+                            </div>
+
+                            <!-- Service Item Type Selection -->
+                            <div style="margin: 12px 0px;">
+                                <div class="form-space ">
+                                    <div class="form-label">
+                                        Select Service Item(s)
+                                    </div>
+                                    <select class="form-select" name="ServiceItemTypeID" id="ServiceItemTypeID" multiple>
+                                        <option value="" selected>Select Service Item Type</option>
+                                        @foreach (var serviceItemType in allServiceItemTypes!)
+                                        {
+                                            <option value="@serviceItemType.Id">@serviceItemType.Title</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Discount Selection -->
+                            <div style="margin: 12px 0px;" hidden="@(SystemState.Instance.FilterForNonStaff)">
+                                <div class="form-space ">
+                                    <div class="form-label">
+                                        Select Discount(s)
+                                    </div>
+                                    <select class="form-select" name="DiscountItem" id="DiscountItem" multiple>
+                                        <option value="" selected>Select Service Item Type</option>
+                                        @foreach (var discount in allDiscounts!)
+                                        {
+                                            <option value="@discount.Id">@discount.Title</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="button-container">
+                            <input type="submit" class="btn btn-success" name="submitButton" value="Create Order" />
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (TempData["AllOrders"] != null)
+    {
+        var orders = TempData["AllOrders"] as List<Order>;
+
+        @if (orders!.Count() > 0)
+        {
+            <!-- Orders Table -->
+            <div class="tableContainer">
+                <!-- Populate the table with data from the database -->
+
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Order Status</th>
+                            <th scope="col">Created Date</th>
+                            <th scope="col">Order Items</th>
+                            <th scope="col" style="text-align: right;">Order Total</th>
+                            <th scope="col" style="text-align: right;">Order Balance</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchableGrid">
+                        @foreach (var order in orders!)
+                        {
+                            var amountPaid = order.CalculateAmountPaid();
+                            var orderTotal = order.CalculateTotal();
+                            var balance = orderTotal.Total - amountPaid;
+
+                            var items = DataHooks.Instance.GetOrderItemsByOrderID(order.Id);
+                            <tr>
+                                <td>
+                                    @if (order.Account != null)
+                                    {
+                                        <span>
+                                            @order.Account.Customer!.LastName, @order.Account.Customer.FirstName
+                                        </span>
+                                    }
+                                </td>
+                                <td>@order.Status!.Title</td>
+                                <td>@order.CreatedDate.ToString("MM/dd/yy")</td>
+                                <td>
+                                    @foreach (var item in items)
+                                    {
+                                        <p>@item?.ServiceItemType?.Title</p>
+                                    }
+                                </td>
+                                <td style="text-align: right;">
+                                    @orderTotal.Total.ToString("C")
+                                </td>
+                                <td style="text-align: right;">
+                                    @balance.ToString("C")
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Details", "EditOrder", "Admin", new { orderID = order.Id }, new { @class = "btn btn-outline-success" })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        }
+        else
+        {
+            TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+            <partial>
+                @Html.Partial("_EmptySplash")
+            </partial>
+        }
+    }
+</body>

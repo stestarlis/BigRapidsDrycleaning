@@ -1,0 +1,222 @@
+﻿/* Testimonials Styling */
+#testimonials {
+    background: #EDF2F8;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+    #testimonials .outerdiv {
+        width: auto;
+        background: #EDF2F8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #testimonials .innerdiv {
+        transform: scale(0.9);
+        margin: 0.5rem;
+        display: grid;
+        grid-gap: 1.5rem;
+        grid-template-rows: repeat(2,15rem);
+        grid-template-columns: repeat(4,17rem);
+    }
+
+    #testimonials .eachdiv {
+        padding: 1rem 2rem;
+        border-radius: 0.8rem;
+        box-shadow: 5px 5px 20px #6d6b6b6b;
+        color: white;
+    }
+
+    #testimonials .div1 {
+        background: var(--brdc-blue1);
+        grid-column: 1/3;
+        grid-row: 1/2;
+        color: black;
+    }
+
+    #testimonials .div2 {
+        background: var(--brdc-blue2);
+        grid-column: 3/4;
+        grid-row: 1/2;
+    }
+
+    #testimonials .div3a {
+        background: var(--brdc-blue3);
+        grid-column: 4/5;
+        grid-row: 1/2;
+        color: white;
+    }
+
+    #testimonials .div3b {
+        background: var(--brdc-orange2);
+        grid-column: 4/5;
+        grid-row: 2/3;
+        color: black;
+    }
+
+    #testimonials .div4 {
+        background: var(--brdc-yellow);
+        grid-column: 1/2;
+        grid-row: 2/3;
+        color: black;
+    }
+
+    #testimonials .div5 {
+        background: var(--brdc-orange1);
+        grid-column: 2/4;
+        grid-row: 2/3;
+    }
+
+.userdetails {
+    display: flex;
+}
+
+.imgbox {
+    margin-right: 1rem;
+}
+
+    .imgbox img {
+        border-radius: 50%;
+        width: 2rem;
+        border: 2px solid #cec5c5;
+    }
+
+.detbox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+    .detbox p {
+        margin: 0;
+    }
+
+    .detbox .name {
+        color: hsl(0, 0%, 0%);
+        font-size: 0.9rem;
+        margin-bottom: 0.1rem;
+        font-weight: 600;
+    }
+
+        .detbox .name.dark {
+            color: #EDF2F8;
+        }
+
+    .detbox .designation {
+        color: hsl(0, 0%, 0%);
+        opacity: 50%;
+        font-size: 0.8rem;
+    }
+
+        .detbox .designation.dark {
+            color: white;
+        }
+
+/* For light backgrounds */
+.review h4 {
+    font-size: 1.4rem;
+    color: #18202D;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+}
+
+.review p {
+    font-size: 0.95rem;
+    color: #18202D;
+    font-weight: 500;
+    opacity: 50%;
+    line-height: 1.5;
+}
+
+/* For dark backgrounds */
+.review.dark h4 {
+    color: hsl(0, 0%, 81%);
+}
+
+.review.dark p {
+    color: #cec5c5;
+}
+
+@media only screen and (max-width: 1200px) {
+    .div5, .div4, .div3a, .div3b, .div2, .div1 {
+        overflow: hidden;
+    }
+
+    #testimonials .innerdiv {
+        transform: scale(0.7);
+        grid-template-rows: repeat(2,11rem);
+        grid-template-columns: repeat(4,13rem);
+        grid-gap: 0.5rem;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .div5, .div4, .div3a, .div3b, .div2, .div1 {
+        overflow: hidden;
+    }
+
+    #testimonials .innerdiv {
+        transform: scale(0.6);
+        grid-template-rows: repeat(2,8rem);
+        grid-template-columns: repeat(4,10rem);
+        grid-gap: 0.5rem;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .innerdiv {
+        transform: scale(0.4);
+    }
+}
+
+/* Green Mission Styling */
+#greenCommitment {
+    margin-top: 24px;
+    background: #2cb71d;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+    #greenCommitment .textContainer {
+        background: #dcffd8ac;
+        border-radius: 12px;
+        padding: 1.0rem;
+    }
+
+
+/* Promos and Coupons Styling */
+#promotionals {
+    display: inline-flex;
+    overflow: auto;
+}
+
+.iconContainer {
+    font-size: 72px;
+    text-align: center;
+}
+
+/* Coupon Styling */
+.coupon {
+    border: 3px dashed #bbb;
+    width: 50%;
+    border-radius: 15px;
+    margin: 8px;
+    text-align: center;
+}
+
+.couponContainer {
+    padding: 8px;
+    background-color: #f1f1f1;
+}
+
+.promo {
+    padding: 8px;
+    border-radius: 4px;
+    background: #ccc;
+    padding: 3px;
+    font-size: 20px;
+    font-weight: 500;
+}

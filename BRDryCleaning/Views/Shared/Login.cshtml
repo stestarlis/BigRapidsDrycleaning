@@ -1,0 +1,78 @@
+﻿@using BRDObjects;
+@using BRDrycleaningDataAccess;
+
+<header>
+    <link href="~/css/laundryLoad.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+
+    <script>
+        $('#exampleModalCenter').on('shown.bs.modal', function () {
+
+        })
+    </script>
+</header>
+
+<style>
+    .vertical-center-wrapper {
+        /* position: relative; */
+        margin: 0 auto;
+        text-align: center !important;
+        width: 70% !important;
+    }
+
+    #login-form {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .login-title {
+        margin-bottom: 0.5em;
+        margin-top: 2em;
+    }
+
+    .comfortable-margin {
+        margin: 12px;
+    }
+</style>
+
+<div class="vertical-center-wrapper text-center">
+    <div id="login-form" class="form-group">
+        <h2 class="login-title">Login</h2>
+        @if (TempData["AlertMsg"] != null)
+        {
+            <div class="alert alert-danger comfortable-margin text-center" role="alert">
+                @TempData["AlertMsg"]!.ToString()
+            </div>
+        }
+        @model Customer
+        @using (Html.BeginForm("LoginAction", "Home", FormMethod.Post, new { role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            @Html.TextBoxFor(x => x.EmailAddress, new { @class = "form-control mb-3", placeholder = "Email Address", required = true })
+            @Html.PasswordFor(x => x.TemporaryPassword, new { @class = "form-control mb-3", placeholder = "Password", required = true })
+            <input type="submit" value="Login" class="form-control btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" />
+            <hr />
+            <p class="text-center">Don't have an account yet?</p>
+            <button type="button" class="btn btn-outline-secondary"><a style="text-decoration: none; color: inherit;" asp-area="" asp-controller="Home" asp-action="CreateAccount">Sign Up</a></button>
+        }
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    @{
+                        TempData["SplashMessage"] = "Please wait for the spin cycle...";
+                    }
+                    <partial>
+                        @Html.Partial("_EmptySplash")
+                    </partial>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

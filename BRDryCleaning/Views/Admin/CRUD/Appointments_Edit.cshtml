@@ -1,0 +1,107 @@
+﻿@using BRDObjects
+@using BRDrycleaningDataAccess
+@using System.Globalization
+@{
+    var scheduleEntryID = TempData["scheduleEntryID"] as int?;
+    var customerName = TempData["customerName"] as string;
+    var scheduleEntry = DataHooks.Instance.GetScheduleEntryByID((int)scheduleEntryID!);
+    var meetingPurposes = DataHooks.Instance.GetAllMeetingPurposes();
+    var meetingTypes = DataHooks.Instance.GetAllMeetingTypes();
+}
+<body>
+    @using (Html.BeginForm("UpdateAppointment", "Admin", FormMethod.Post))
+    {
+        <div class="padMe">
+            @if (scheduleEntry.Account != null)
+            {
+                <h2>Appointment for @scheduleEntry.Account.Customer.FirstName</h2>
+            }
+            else
+            {
+                <h2>Customer Appointment</h2>
+            }
+
+            <input type="hidden" id="appointmentID" name="AppointmentID" value="@scheduleEntry!.Id" />
+            <input type="hidden" id="accountID" name="AccountID" value="@scheduleEntry.AccountId" />
+
+            <!-- Appointment Title -->
+            <div>
+                <div>
+                    <b>Appt Time: @scheduleEntry.MeetingStart.Value.ToString("MM/dd/yy hh:mm tt") - @scheduleEntry.MeetingEnd.Value.ToString("hh:mm tt")</b>
+                </div>
+                <details>
+                    <summary>Change Scheduled Time</summary>
+                    <div style="border: 1p solid grey !important; border-radius: 4px;">
+                        <div class="form-label">
+                            Appointment Start
+                        </div>
+                        <span style="display:inline-flex; width:100%;">
+                            <input type="datetime-local" id="meetingStart" name="meetingStart" class="form-control" />
+                        </span>
+                        <div class="form-label">
+                            Appointment End
+                        </div>
+                        <span style="display:inline-flex; width:100%;">
+                            <input type="time" id="meetingEnd" name="meetingEnd" class="form-control" />
+                        </span>
+                    </div>
+                </details>
+
+            </div>
+
+            <div style="margin: 12px 0px;">
+                <div class="form-space ">
+                    <div class="form-label">
+                        Appointment Purpose
+                    </div>
+                    <select class="form-select" name="meetingPurposeID" id="MeetingPurposeID">
+                        @foreach (var purpose in meetingPurposes!)
+                        {
+                            if (purpose.Id == scheduleEntry.MeetingPurposeId)
+                            {
+                                <option value="@purpose.Id" selected>@purpose.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@purpose.Id">@purpose.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin: 12px 0px;">
+                <div class="form-space ">
+                    <div class="form-label">
+                        Appointment Type
+                    </div>
+                    <select class="form-select" name="meetingTypeID" id="MeetingTypeID">
+                        @foreach (var meetingType in meetingTypes!)
+                        {
+                            if (meetingType.Id == scheduleEntry.MeetingTypeId)
+                            {
+                                <option value="@meetingType.Id" selected>@meetingType.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@meetingType.Id">@meetingType.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <!-- ScheduleEntry Notes -->
+            <div class="mb-3">
+                <label for="ScheduleEntryNotes" class="form-label">Notes</label>
+                <input type="text" class="form-control" id="AppointmentNotes" name="appointmentNotes" rows="3" value="@scheduleEntry.Notes" />
+            </div>
+        </div>
+        <div>
+            <span class="button-container" style="float: left;">
+                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                @Html.ActionLink("Cancel", "ReadAppointments", "Admin", null, new { @class = "btn btn-outline-secondary" })
+            </span>
+            <input type="submit" class="btn btn-outline-danger" style="float: right;" name="submitButton" value="Delete" />
+        </div>
+    }
+</body>

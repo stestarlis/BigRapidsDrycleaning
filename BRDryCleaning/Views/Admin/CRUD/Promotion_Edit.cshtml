@@ -1,0 +1,84 @@
+﻿@using BRDObjects
+@using static BRDObjects.Statics.Enums
+@{
+    var myPromo = TempData["myPromo"] as Promotional;
+    var dTs = TempData["DiscountTypes"] as List<DiscountType>;   
+}
+
+<body>
+    <h1>Edit Promotionals - @myPromo!.Title</h1>
+    <div>
+        @using (Html.BeginForm("EditPromo", "Admin", FormMethod.Post))
+        {
+            <div class="padMe">
+                <input type="hidden" name="ServiceID" id="ServiceID" value="@myPromo.Id" />
+
+                <!-- Promotional Title -->
+                <div>
+                    <div class="form-label">
+                        Promotional Title
+                    </div>
+                    <input type="text" class="form-control" id="PromotionalTitle" name="PromotionalTitle" value="@myPromo!.Title" placeholder="@myPromo!.Title">
+                </div>
+
+                <!-- Promotional Price -->
+                <div>
+                    <div class="form-label">
+                        Promotional Price
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="PromotionalPrice" name="PromotionalPrice" value="@myPromo!.Price.ToString("C")" placeholder="@myPromo!.Price.ToString("C")">
+                        <span class="input-group-text">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Promotional Discount Type Selection -->
+                <div style="margin: 12px 0px;">
+                    <div class="form-space">
+                        <div class="form-label">
+                            Select Promotional Items
+                        </div>
+                        <select class="form-select" name="PromotionalIds" id="PromotionalIds" multiple>
+                            @foreach (var d in dTs!)
+                            {
+                                if (myPromo.DiscountTypeId == d.Id)
+                                {
+                                    <option value="@d.Id" selected>@d.Title</option>
+                                }
+                                else
+                                {
+                                    <option value="@d.Id">@d.Title</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- Promotional Active Status  -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Promotional Active Status
+                    </div>
+                    <select class="form-select" name="IsActive" id="IsActive">
+                        @if (myPromo.IsActive == true)
+                        {
+                            <option value="true" selected>Active</option>
+                            <option value="false">Inactive</option>
+                        }
+                        else
+                        {
+                            <option value="true">Active</option>
+                            <option value="false" selected>Inactive</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                @Html.ActionLink("Close", "ReadPromotionals", "Admin", null, new { @class = "btn btn-secondary" })
+                <input type="submit" class="btn btn-outline-danger" style="float: right;" name="submitButton" value="Delete" />
+            </div>
+        }
+    </div>
+</body>

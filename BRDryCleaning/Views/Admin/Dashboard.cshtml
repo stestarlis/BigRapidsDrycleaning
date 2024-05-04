@@ -1,0 +1,451 @@
+﻿@page
+@using BRDrycleaningDataAccess
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    TempData["subjectLine"] = string.Empty;
+    TempData["bodyText"] = string.Empty;
+    TempData["locationID"] = string.Empty;
+}
+<link href="~/css/Admin.css" rel="stylesheet" />
+<link href="~/css/Dashboard.css" rel="stylesheet" />
+
+<body>
+
+    <!-- Modals -->
+    <div>
+        <!-- Hours of Operation Modal -->
+        <div class="modal fade" id="hours-of-op-modal" tabindex="-1" aria-labelledby="hours-of-op-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="hours-of-op-modal-label">Edit Store Details</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-form">
+                        @using (Html.BeginForm("EditHoursOfOp", "Admin", FormMethod.Post))
+                        {
+                            <!-- Monday -->
+                            <div>
+                                <h5>Monday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="mondayO" name="MondayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="mondayC" name="MondayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tuesday -->
+                            <div>
+                                <h5>Tuesday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="tuesdayO" name="TuesdayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="tuesdayC" name="TuesdayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Wednesday -->
+                            <div>
+                                <h5>Wednesday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="wednesdayO" name="WednesdayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="wednesdayC" name="WednesdayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Thursday -->
+                            <div>
+                                <h5>Thursday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="thursdayO" name="ThursdayO" value="">
+                                    </div><div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="thursdayC" name="ThursdayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Friday -->
+                            <div>
+                                <h5>Friday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="fridayO" name="FridayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="fridayC" name="FridayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Saturday -->
+                            <div>
+                                <h5>Saturday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="saturdayO" name="SaturdayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="saturdayC" name="SaturdayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sunday -->
+                            <div>
+                                <h5>Sunday</h5>
+                                <div class="hourEntry">
+                                    <div class="hourEntry">
+                                        <div class="form-label">Open</div>
+                                        <input type="text" class="form-control" id="sundayO" name="SundayO" value="">
+                                    </div>
+                                    <div class="hourEntry">
+                                        <div class="form-label">Close</div>
+                                        <input type="text" class="form-control" id="sundayC" name="SundayC" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="button-container">
+                                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        @if (SystemState.Instance.Customer != null)
+        {
+            <h1>
+                @if (DateTime.Now.Hour <= 12)
+                {
+                    <em>
+                        Good Morning, @(SystemState.Instance.Customer.FirstName)
+                    </em>
+                }
+                else if (DateTime.Now.Hour <= 16)
+                {
+                    <em>
+                        Good Afternoon, @(SystemState.Instance.Customer.FirstName)
+                    </em>
+                }
+                else
+                {
+                    <em>
+                        Good Evening, @(SystemState.Instance.Customer.FirstName)
+                    </em>
+                }
+            </h1>
+        }
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h2 class="h2">Dashboard</h2>
+        </div>
+
+        <!-- Hours of Operation and General Information -->
+        <div class="info" hidden="@(SystemState.Instance.FilterForNonStaff)">
+            <!-- General Information -->
+            <div class="infoSplit">
+                <h2>General Info</h2>
+                @Html.ActionLink("Edit Store Information", "Settings", "Admin", null, new { @class = "btn btn-secondary" })
+            </div>
+
+            <div class="vl"></div>
+
+            <!-- TODO: Bind the hours to data from the database -->
+            <!-- Hours of Operation -->
+            <div class="infoSplit">
+                <h2>Hours of Operation</h2>
+                <div class="hoursOfOp">
+                    <div class="day">
+                        <h5>Monday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="monOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="monClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Tuesday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="tuesOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="tuesClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Wednesday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="wedOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="wedClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Thursday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="thursOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="thursClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Friday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="friOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="friClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Saturday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="satOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="satClose">
+                            4 PM
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="day">
+                        <h5>Sunday</h5>
+                    </div>
+                    <div class="hours">
+                        <div id="sunOpen">
+                            8 AM
+                        </div>
+                        to
+                        <div id="sunClose">
+                            4 PM
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#hours-of-op-modal">
+                    Edit Hours of Operation
+                </button>
+            </div>
+        </div>
+
+        <hr hidden="@(SystemState.Instance.FilterForNonStaff)" />
+        @{
+            var scheduleEntries =
+            SystemState.Instance.FilterForNonStaff ?
+            DataHooks.Instance.GetAllCustomerScheduleEntries(SystemState.Instance.Customer.Accounts.First().Id) :
+            DataHooks.Instance.GetAllScheduleEntries();
+
+            scheduleEntries = scheduleEntries.Where(x => x.MeetingStart >= DateTime.Now).OrderBy(x => x.MeetingStart).ToList();
+        }
+        <h2>Upcoming Appointment(s)</h2>
+        <div class="table-responsive small">
+            @if (scheduleEntries.Count <= 0)
+            {
+                TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+                <partial>
+                    @Html.Partial("_EmptySplash")
+                </partial>
+            }
+            else
+            {
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Start Date & Time</th>
+                            <th scope="col">Appointment Type</th>
+                            <th scope="col">Appointment Purpose</th>
+                            <th scope="col">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        @foreach (var entry in scheduleEntries)
+                        {
+                            <tr>
+                                <td>@entry.Account?.Customer?.FirstName @entry.Account?.Customer?.LastName</td>
+                                <td>@entry.MeetingStart.ToString() - @entry.MeetingEnd.Value.TimeOfDay</td>
+                                <td>@entry.MeetingType?.Title</td>
+                                <td>@entry.MeetingPurpose?.Title</td>
+                                <td>@entry.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <script>
+        // Populate the fields on the info modal with the current data
+        const hoursModal = document.getElementById('hours-of-op-modal')
+        if (hoursModal) {
+            hoursModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                const button = event.relatedTarget
+
+                // Extract info from data-bs-* attributes
+                const serviceObj = button.getAttribute('data-bs-info');
+
+                // Update Monday content
+                mO = document.getElementById('monOpen').innerText;
+                mC = document.getElementById('monClose').innerText;
+                const mH1 = hoursModal.querySelector('#mondayO');
+                const mH2 = hoursModal.querySelector('#mondayC');
+                mH1.value = mO;
+                mH2.value = mC;
+
+                // Update Tuesday content
+                tO = document.getElementById('tuesOpen').innerText;
+                tC = document.getElementById('tuesClose').innerText;
+                const tH1 = hoursModal.querySelector('#tuesdayO');
+                const tH2 = hoursModal.querySelector('#tuesdayC');
+                tH1.value = tO;
+                tH2.value = tC;
+
+                // Update Wednesday content
+                wO = document.getElementById('wedOpen').innerText;
+                wC = document.getElementById('wedClose').innerText;
+                const wH1 = hoursModal.querySelector('#wednesdayO');
+                const wH2 = hoursModal.querySelector('#wednesdayC');
+                wH1.value = wO;
+                wH2.value = wC;
+
+                // Update Thursday content
+                rO = document.getElementById('thursOpen').innerText;
+                rC = document.getElementById('thursClose').innerText;
+                const rH1 = hoursModal.querySelector('#thursdayO');
+                const rH2 = hoursModal.querySelector('#thursdayC');
+                rH1.value = rO;
+                rH2.value = rC;
+
+                // Update Friday content
+                fO = document.getElementById('friOpen').innerText;
+                fC = document.getElementById('friClose').innerText;
+                const fH1 = hoursModal.querySelector('#fridayO');
+                const fH2 = hoursModal.querySelector('#fridayC');
+                fH1.value = fO;
+                fH2.value = fC;
+
+                // Update Saturday content
+                sO = document.getElementById('satOpen').innerText;
+                sC = document.getElementById('satClose').innerText;
+                const sH1 = hoursModal.querySelector('#saturdayO');
+                const sH2 = hoursModal.querySelector('#saturdayC');
+                sH1.value = sO;
+                sH2.value = sC;
+
+                // Update Sunday content
+                nO = document.getElementById('sunOpen').innerText;
+                nC = document.getElementById('sunClose').innerText;
+                const nH1 = hoursModal.querySelector('#sundayO');
+                const nH2 = hoursModal.querySelector('#sundayC');
+                nH1.value = nO;
+                nH2.value = nC;
+
+
+            })
+        }
+
+        // Populate the fields on the hours of operation modal with the current data
+        const infoModal = document.getElementById('store-info-modal')
+        if (infoModal) {
+            infoModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                const button = event.relatedTarget
+
+                // Extract info from data-bs-* attributes
+                const serviceObj = button.getAttribute('data-bs-info');
+
+                // Update the modal's content.
+                streetAddress = document.getElementById('storeStreetAddress').innerText;
+                city = document.getElementById('storeCity').innerText;
+                state = document.getElementById('storeState').innerText;
+                zip = document.getElementById('storeZIP').innerText;
+                phone = document.getElementById('storePhone').innerText;
+                email = document.getElementById('storeEmail').innerText;
+                about = document.getElementById('storeAboutUs').innerText;
+
+                const sA = infoModal.querySelector('#streetAddress');
+                const sC = infoModal.querySelector('#city');
+                const sS = infoModal.querySelector('#state');
+                const sZ = infoModal.querySelector('#zip');
+                const sP = infoModal.querySelector('#phone');
+                const sE = infoModal.querySelector('#email');
+                const sAU = infoModal.querySelector('#aboutUs');
+
+                sA.value = streetAddress;
+                sC.value = city;
+                sS.value = state;
+                sZ.value = zip;
+                sP.value = phone;
+                sE.value = email;
+                sAU.value = about;
+            })
+        }
+
+    </script>
+</body>

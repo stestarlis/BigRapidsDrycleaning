@@ -1,0 +1,51 @@
+﻿@using BRDObjects
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var service = TempData["myService"] as Service;
+}
+<body>
+    <h1>Service Details</h1>
+    <h2>@service!.Title</h2>
+    <div>
+        <span><h3>Price: </h3> @service.Price.ToString("C")</span>
+        <hr />
+        <span>
+            <h3>Service Items </h3>
+            <div style="margin-left: 18px;">
+                <dl>
+                    @foreach (var item in service.ServiceItemTypes)
+                    {
+                        <dt>@item.Title</dt>
+                        <dd>$@item.Price</dd>
+                    }
+                </dl>
+            </div>
+        </span>
+        <hr />
+        <span>
+            <h3>Service Promotions </h3>
+            <dl>
+                @foreach (var item in service.ServicePromotionals)
+                {
+                    <dt>@item.Title</dt>
+                    <dt>@item.Promotional?.Price</dt>
+                    <dt>@item.Promotional?.DiscountType?.Title</dt>
+                }
+            </dl>
+        </span>
+        <hr />
+        <span><h3>Active? </h3> @service.IsActive</span>
+        <hr />
+        <div>
+            <span><h3>Taxable? </h3> @service.IsTaxable!.Value</span>
+            <br />
+            @if (service.IsTaxable == true)
+            {
+                <span><h3>Tax Rate: </h3> @service.TaxRate<span>%</span></span>
+            }
+
+        </div>
+    </div>
+</body>

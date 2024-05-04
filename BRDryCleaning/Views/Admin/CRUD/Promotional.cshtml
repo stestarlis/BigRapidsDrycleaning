@@ -1,0 +1,159 @@
+﻿@page
+@using BRDObjects
+@{
+    var promotionals = TempData["Promos"] as List<Promotional> ?? new();
+    var discountTypes = TempData["DiscountTypes"] as List<DiscountType> ?? new();
+}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
+    <link href="~/css/Admin.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>Promotions and Deals</h1>
+    <div class="toolbar">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#new-modal" class="btn btn-success">
+            Create New Promo
+        </button>
+        <div style="margin: 4px; max-width: 250px;">
+            <input type="text" class="form-control" style="height: 100%; margin-left: 15px;" id="mySearch" onkeyup="searchGrid()" placeholder="Search..." title="Type in a category">
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div>
+        <!-- New Promotional Modal -->
+        <div class="modal fade" id="new-modal" tabindex="-1" aria-labelledby="new-modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="new-modal-label">New Promotional</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-form">
+                        @using (Html.BeginForm("NewPromo", "Admin", FormMethod.Post))
+                        {
+                            <div class="padMe">
+                                <!-- Promotional Title -->
+                                <div>
+                                    <div class="form-label">
+                                        Promotional Title
+                                    </div>
+                                    <input type="text" class="form-control" id="NewPromoTitle" name="NewPromoTitle" value="" placeholder="">
+                                </div>
+
+                                <!-- Promotional Price -->
+                                <div>
+                                    <div class="form-label">
+                                        Promotional Price
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$/%</span>
+                                        <input type="number" class="form-control" id="NewPromoPrice" name="NewPromoPrice" value="">
+                                    </div>
+                                </div>
+
+                                <!-- Promotional Active Status  -->
+                                <div class="form-space">
+                                    <div class="form-label">
+                                        Promotional Active Status
+                                    </div>
+                                    <select class="form-select" name="NewPromoActiveStatus" id="NewPromoActiveStatus">
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
+                                </div>
+
+                                <!-- Promotional Discount Type Selection-->
+                                <div class="form-space ">
+                                    <div class="form-label">
+                                        Select Promotional Discount Type
+                                    </div>
+                                    @if (TempData["DiscountTypes"] != null)
+                                    {
+                                        <select class="form-select" name="NewPromoDiscountItemID" id="NewPromoDiscountItemID">
+                                            @{
+                                                var dTs = TempData["DiscountTypes"] as List<DiscountType>;
+                                                <option value="" selected>Select Discount Type</option>
+                                                @foreach (var d in dTs!)
+                                                {
+                                                    <option value="@d.Id">@d.Title</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="button-container">
+                                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (promotionals.Count > 0)
+    {
+        <div class="tableContainer">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Promotional Title</th>
+                        <th scope="col">Active Status</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Discount Type</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody id="searchableGrid">
+                    @foreach (var p in promotionals!)
+                    {
+                        <tr>
+                            <td>
+                                @p.Title
+                            </td>
+                            <td>
+                                @if (p.IsActive == true)
+                                {
+                                    <i class='bx bx-check'></i>
+                                }
+                                else
+                                {
+                                    <i class='bx bx-x'></i>
+                                }
+                            </td>
+                            <td>
+                                @p.Price
+                            </td>
+                            <td>
+                                @foreach (var dT in discountTypes!)
+                                {
+                                    @if (p.DiscountTypeId == dT.Id)
+                                    {
+                                        @dT.Title
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @Html.ActionLink("Details", "EditPromotional", "Admin", new { promoID = p.Id }, new { @class = "btn btn-outline-success" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        TempData["SplashMessage"] = "Hm... Laundry basket is empty";
+        <partial>
+            @Html.Partial("_EmptySplash")
+        </partial>
+    }
+</body>

@@ -1,0 +1,154 @@
+﻿@using BRDObjects
+@using static BRDObjects.Statics.Enums
+@{
+    var myService = TempData["myService"] as Service;
+    var sIT = TempData["serviceItemTypes"] as List<ServiceItemType>;
+    var servicePromo = TempData["Promotionals"] as List<Promotional>;
+    var stores = TempData["Stores"] as List<Store>;
+}
+
+<body>
+    <h1>Edit Service - @myService!.Title</h1>
+    <div>
+        @using (Html.BeginForm("EditService", "Admin", FormMethod.Post))
+        {
+            <div class="padMe">
+                <input type="hidden" name="ServiceID" id="ServiceID" value="@myService.Id" />
+
+                <!-- Service Title -->
+                <div>
+                    <div class="form-label">
+                        Service Title
+                    </div>
+                    <input type="text" class="form-control" id="ServiceTitle" name="ServiceTitle" value="@myService!.Title" placeholder="@myService!.Title">
+                </div>
+
+                <!-- Service Price -->
+                <div>
+                    <div class="form-label">
+                        Service Price
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="ServicePrice" name="ServicePrice" value="@myService!.Price.ToString("C")" placeholder="@myService!.Price.ToString("C")">
+                        @* <span class="input-group-text">$0.00</span> *@
+                    </div>
+                </div>
+
+                <!-- Service Item Type Selection-->
+                <div style="margin: 12px 0px;">
+                    <div class="form-space ">
+                        <div class="form-label">
+                            Select Service Item Type
+                        </div>
+                        <select class=" form-select" name="ServiceItemTypeID" id="ServiceItemTypeID" multiple>
+                            @foreach (var s in sIT!)
+                            {
+                                if (myService.ServiceItemTypes.Contains(s))
+                                {
+                                    <option value="@s.Id" selected>@s.Title</option>
+                                }
+                                else
+                                {
+                                    <option value="@s.Id">@s.Title</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div style="margin: 12px 0px;">
+                    <div class="form-space ">
+                        <div class="form-label">
+                            Location
+                        </div>
+                        <select class="form-select" name="locationID" id="locationID">
+                            @foreach (var s in stores!)
+                            {
+                                <option value="@s.Id" selected="@(s.Id == myService.StoreId)">@s.Title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Service Promo Selection-->
+                <div style="margin: 12px 0px;">
+                    <div class="form-space ">
+                        <div class="form-label">
+                            Select Service Promos
+                        </div>
+                        <select class=" form-select" name="ServicePromoID" id="ServicePromoID" multiple>
+                            @foreach (var s in servicePromo!)
+                            {
+                                if (servicePromo.Contains(s))
+                                {
+                                    <option value="@s.Id" selected>@s.Title</option>
+                                }
+                                else
+                                {
+                                    <option value="@s.Id">@s.Title</option>
+                                }
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Service Active Status  -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Service Active Status
+                    </div>
+                    <select class="form-select" name="IsActive" id="IsActive">
+                        @if (myService.IsActive == true)
+                        {
+                            <option value="true" selected>Active</option>
+                            <option value="false">Inactive</option>
+                        }
+                        else
+                        {
+                            <option value="true">Active</option>
+                            <option value="false" selected>Inactive</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Taxable Status -->
+                <div class="form-space">
+                    <div class="form-label">
+                        Set Taxable Status
+                    </div>
+                    <select class="form-select" name="IsTaxable" id="IsTaxable">
+                        @if (myService.IsTaxable == true)
+                        {
+                            <option value="true" selected>Yes</option>
+                            <option value="false">No</option>
+                        }
+                        else
+                        {
+                            <option value="true">Yes</option>
+                            <option value="false" selected>No</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Tax Rate -->
+                <div>
+                    <div class="form-label">
+                        Tax Rate
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="TaxRate" name="TaxRate" value="@myService.TaxRate" placeholder="@myService.TaxRate">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <input type="submit" class="btn btn-success" name="submitButton" value="Save" />
+                @Html.ActionLink("Cancel", "ReadServices", "Admin", null, new { @class = "btn btn-secondary" })
+                <input type="submit" class="btn btn-outline-danger" style="float: right;" name="submitButton" value="Delete" />
+            </div>
+        }
+    </div>
+</body>

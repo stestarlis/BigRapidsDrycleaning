@@ -1,0 +1,84 @@
+﻿@using BRDObjects
+
+<header>
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <style>
+        #testimonials-list {
+            text-align: justify;
+        }
+
+            #testimonials-list td, th {
+                margin-left: 15px;
+            }
+
+        .testimonial-body {
+            word-wrap: normal;
+        }
+    </style>
+</header>
+
+@{
+    List<Testimonial> testimonials = default!;
+
+    if (TempData["AllTestimonials"] != null)
+    {
+        testimonials = TempData["AllTestimonials"] as List<Testimonial> ?? new List<Testimonial>();
+    }
+}
+
+<table id="testimonials-list" class="table table-striped form-control">
+    <thead class="thead">
+    <th>
+        Subject
+    </th>
+    <th>
+        Body
+    </th>
+    <th>
+        Customer
+    </th>
+    <th>
+        Public
+    </th>
+    <th></th>
+    <th></th>
+    </thead>
+    <tbody>
+        @foreach (var testimonial in testimonials)
+        {
+            using (Html.BeginForm("SetTestimonialResponse", "Admin", FormMethod.Post))
+            {
+                <input type="text" hidden name="testimonialID" value="@testimonial.Id" />
+                <tr>
+                    <td>
+                        @testimonial.Subject
+                    </td>
+                    <td class="testimonial-body">
+                        @testimonial.Body
+                    </td>
+                    <td>
+                        @if (testimonial.Customer == null)
+                        {
+                            <p>Anonymous User</p>
+                        }
+                        else
+                        {
+                            <p>@testimonial!.Customer!.LastName, @testimonial.Customer.FirstName</p>
+
+                        }
+                    </td>
+                    <td>
+                        <input readonly type="checkbox" checked="@(testimonial.DisplayToPublic)" />
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary" name="submitButton" value="toggle">Toggle</button>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary" name="submitButton" value="deny">Deny</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

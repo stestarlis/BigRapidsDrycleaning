@@ -1,0 +1,70 @@
+﻿@using BRDrycleaningDataAccess
+@{
+    var stores = DataHooks.Instance.GetAllStores();
+    string subjectLine = TempData["subjectLine"]?.ToString() ?? string.Empty;
+    string bodyText = TempData["bodyText"]?.ToString() ?? string.Empty;
+    int.TryParse((TempData["locationID"]?.ToString() ?? "-1"), out var locationID);
+}
+
+<header>
+    <style>
+        .form-container {
+            width: 40%;
+            margin: 0 auto;
+        }
+
+        .center-text {
+            text-align: center;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .control-margins {
+            margin: 0px 0px 15px 0px;
+        }
+
+        .form-label {
+            text-align: left !important;
+        }
+    </style>
+</header>
+
+@if (TempData["SubmissionAlert"] != null)
+{
+    <div class="alert alert-success comfortable-margin align-text-center" role="alert">
+        @TempData["SubmissionAlert"]!.ToString()
+    </div>
+}
+
+@if (TempData["AlertMsg"] != null)
+{
+    <div class="alert alert-danger comfortable-margin align-text-center" role="alert">
+        @TempData["AlertMsg"]!.ToString()
+    </div>
+}
+
+<div class="form-container form-group">
+    <h2 class="center-text">Submit A Testimonial</h2>
+    <p class="center-text">Did you enjoy your visit? We'd love to hear about your experience!</p>
+    @using (Html.BeginForm("SubmitTestimonial", "Home", FormMethod.Post))
+    {
+        <label for="subjectLine" class="form-label">Subject</label>
+        <input maxlength="75" required class="form-control control-margins" type="text" name="subjectLine" id="subjectLine" value="@subjectLine" />
+
+        <label for="testimonialBody" class="form-label">Body</label>
+        <textarea maxlength="250" required rows="5" cols="20" class="form-control control-margins" name="bodyText" id="bodyText" value="@bodyText">@bodyText</textarea>
+        
+        <label for="Location" class="form-label">Which location?</label>
+        <select required class="form-control control-margins" name="testimonialLocationID" id="testimonialLocationID">
+            <option selected="@locationID <= 0">Select a location</option>
+            @foreach(var store in stores)
+            {
+                <option value="@store.Id" selected="@(store.Id == locationID)">@store.Title</option>
+            }
+        </select>
+        
+        <button class="btn btn-primary full-width control-margins" type="submit" value="Submit">Submit</button>
+    }
+</div>
